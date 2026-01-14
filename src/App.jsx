@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
-import { createContext, useContext, useEffect, useState } from "react";
-import Lenis from "@studio-freight/lenis";
+import { createContext, useContext, useEffect, useState, useRef } from "react";
+import Lenis from "lenis";
 
 export const LenisContext = createContext(null);
 
@@ -11,30 +11,39 @@ export function useLenis() {
 }
 
 function App() {
+  const lenisRef = useRef(null);
 
   useEffect(() => {
-  if ('scrollRestoration' in window.history) {
-    window.history.scrollRestoration = 'manual';
-  }
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
 
-  // force scroll top
-  window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
 
-  const lenis = new Lenis({
-    duration: 1.2,
-    smoothWheel: true,
-    smoothTouch: false,
-  });
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      smoothTouch: false,
+      wheelMultiplier: 1,
+      touchMultiplier: 2,
+    });
 
-  const raf = (time) => {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  };
+    lenisRef.current = lenis;
 
-  requestAnimationFrame(raf);
+    let animationFrameId;
+    const raf = (time) => {
+      lenis.raf(time);
+      animationFrameId = requestAnimationFrame(raf);
+    };
 
-  return () => lenis.destroy();
-}, []);
+    animationFrameId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      lenis.destroy();
+    };
+  }, []);
   return (
     <BrowserRouter>
       <Routes>

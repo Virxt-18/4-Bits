@@ -1,5 +1,19 @@
 {
+  "loading": "Loading",
   "tripshield": "TripShield",
-  "login": "Login",
-  "logout": "Logout"
+  "features": "Features",
+  "contact": "Contact",
+  "getstarted": "Get Started",
+  "reg": "Register",
+  "travelsafely": "Travel Safely",
+  "safe": "Begin your safe journey",
+  "authlogin": "Authority Login",
+  "dashboard": "Dashboard",
+  "cpf": "Core Platform Features",
+  "cfe": "Complete Safety Ecosystem",
+  "cfetext": "A comprehensive, privacy-first system designed to protect tourists while respecting their travel experience.",
+  "id": "Digital Tourist ID",
+  "idtext": "Blockchain-secured digital IDs issued at airports, hotels, and check-posts with integrated KYC verification.",
+  "idaadhaar": "Aadhaar/Passport Integration"
+
 }

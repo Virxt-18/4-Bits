@@ -12,7 +12,7 @@ import "../i18n.js";
 
 const Home = () => {
   const { i18n } = useTranslation();
-
+  const [isLoading, setIsLoading] = useState(true);
   const [language, setLanguage] = useState(i18n.language);
 
   console.log(i18n.language);
@@ -24,15 +24,15 @@ const Home = () => {
 
   return (
     <>
-      <Loading />
+      <Loading onFinish={() => setIsLoading(false)} />
       <div className="min-h-screen min-w-screen overflow-x-hidden">
         <Header />
         <main>
           <Hero />
-        <Translate language={language} changeLanguage={changeLanguage} />
           <Features />
         </main>
         <Footer />
+        {!isLoading && <Translate language={language} changeLanguage={changeLanguage} />}
       </div>
     </>
   );
