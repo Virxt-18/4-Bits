@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { LogOut, User, MapPin, Navigation, CreditCard, Phone as PhoneIcon } from "lucide-react";
+import { LogOut, User, MapPin, Navigation, CreditCard, Copy, Check, AlertTriangle, Flag } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { sendSOSAlert } from "../api/sosAlert";
+import { submitReport } from "../api/reportAlert";
 
 // Fix for default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
@@ -27,6 +29,43 @@ function MapUpdater({ center }) {
   return null;
 }
 
+// Reusable labeled row with optional copy button and graceful fallbacks
+function FieldRow({ label, value, loading, copyable }) {
+  const [copied, setCopied] = useState(false);
+
+  const displayValue = loading ? "…" : (value && String(value).trim().length ? value : "Not provided");
+
+  const onCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(String(value ?? ""));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {}
+  };
+
+  return (
+    <div className="flex items-center gap-3 bg-[rgba(2,16,42,0.8)] rounded p-3">
+      <span className="text-gray-400 shrink-0 min-w-[110px]">{label}</span>
+      <span
+        className="text-white/90 break-all grow"
+        title={loading ? "" : String(value ?? "")}
+      >
+        {displayValue}
+      </span>
+      {copyable && !loading && value && (
+        <button
+          type="button"
+          onClick={onCopy}
+          className="ml-auto inline-flex items-center gap-1 text-[rgba(18,211,166,1)] hover:text-[rgba(18,211,166,0.8)] transition"
+          title="Copy"
+        >
+          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+        </button>
+      )}
+    </div>
+  );
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -37,6 +76,15 @@ const Dashboard = () => {
   const [watchId, setWatchId] = useState(null);
   const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [sosOpen, setSosOpen] = useState(false);
+  const [sosSending, setSosSending] = useState(false);
+  const [sosError, setSosError] = useState("");
+  const [sosSuccess, setSosSuccess] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportSending, setReportSending] = useState(false);
+  const [reportError, setReportError] = useState("");
+  const [reportSuccess, setReportSuccess] = useState(false);
+  const [reportForm, setReportForm] = useState({ title: '', description: '', category: 'general' });
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -128,6 +176,96 @@ const Dashboard = () => {
     }
   };
 
+  const sendSOS = async () => {
+    if (!user) {
+      console.error("No user found");
+      setSosError("User not authenticated");
+      return;
+    }
+    
+    console.log("Sending SOS alert to MongoDB...");
+    setSosSending(true);
+    setSosError("");
+    setSosSuccess(false);
+    
+    try {
+      const alertData = {
+        uid: user.uid,
+        email: user.email || null,
+        location: location ? { lat: location[0], lng: location[1] } : null,
+        status: "active",
+      };
+      
+      console.log("Alert data:", alertData);
+      const result = await sendSOSAlert(alertData);
+      
+      if (result.success) {
+        console.log("SOS alert sent successfully:", result.data);
+        setSosSuccess(true);
+        setSosOpen(false);
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setSosSuccess(false), 5000);
+      } else {
+        throw new Error(result.error || "Failed to send alert");
+      }
+    } catch (e) {
+      console.error("Failed to send SOS:", e);
+      setSosError(`Failed to send SOS: ${e.message}`);
+      setSosOpen(false);
+    } finally {
+      setSosSending(false);
+    }
+  };
+
+  const sendReport = async () => {
+    if (!user) {
+      setReportError("User not authenticated");
+      return;
+    }
+    
+    if (!reportForm.title.trim()) {
+      setReportError("Report title is required");
+      return;
+    }
+    
+    console.log("Submitting report to MongoDB...");
+    setReportSending(true);
+    setReportError("");
+    setReportSuccess(false);
+    
+    try {
+      const reportData = {
+        uid: user.uid,
+        email: user.email || null,
+        title: reportForm.title,
+        description: reportForm.description,
+        category: reportForm.category,
+        location: location ? { lat: location[0], lng: location[1] } : null,
+      };
+      
+      console.log("Report data:", reportData);
+      const result = await submitReport(reportData);
+      
+      if (result.success) {
+        console.log("Report submitted successfully:", result.data);
+        setReportSuccess(true);
+        setReportOpen(false);
+        setReportForm({ title: '', description: '', category: 'general' });
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setReportSuccess(false), 5000);
+      } else {
+        throw new Error(result.error || "Failed to submit report");
+      }
+    } catch (e) {
+      console.error("Failed to submit report:", e);
+      setReportError(`Failed to submit report: ${e.message}`);
+    } finally {
+      setReportSending(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[rgba(2,16,42,1)] flex items-center justify-center">
@@ -141,14 +279,70 @@ const Dashboard = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-12">
           <h1 className="text-4xl font-bold">Dashboard</h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg transition"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => { setReportOpen(true); setReportError(""); setReportSuccess(false); }}
+              className="flex items-center gap-2 bg-orange-600 hover:bg-orange-700 px-6 py-3 rounded-lg transition font-semibold"
+              title="Submit Report"
+            >
+              <Flag className="w-5 h-5" /> Report
+            </button>
+            <button
+              type="button"
+              onClick={() => { setSosOpen(true); setSosError(""); setSosSuccess(false); }}
+              className="flex items-center gap-2 bg-red-700 hover:bg-red-800 px-6 py-3 rounded-lg transition shadow-[0_0_20px_rgba(239,68,68,0.4)] font-semibold"
+              title="Send SOS Alert"
+            >
+              <AlertTriangle className="w-5 h-5" /> SOS Alert
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 bg-gray-700 hover:bg-gray-800 px-6 py-3 rounded-lg transition"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
         </div>
+
+        {sosSuccess && (
+          <div className="bg-green-500/15 border border-green-500 text-green-400 px-4 py-3 rounded-lg mb-6">
+            SOS alert sent successfully.
+          </div>
+        )}
+        {sosError && (
+          <div className="bg-red-500/15 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6">
+            {sosError}
+          </div>
+        )}
+        {reportSuccess && (
+          <div className="bg-green-500/15 border border-green-500 text-green-400 px-4 py-3 rounded-lg mb-6">
+            Report submitted successfully.
+          </div>
+        )}
+        {reportError && (
+          <div className="bg-red-500/15 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6">
+            {reportError}
+          </div>
+        )}
+
+        <SosModal
+          open={sosOpen}
+          onClose={() => setSosOpen(false)}
+          onConfirm={sendSOS}
+          sending={sosSending}
+          hasLocation={!!location}
+        />
+
+        <ReportModal
+          open={reportOpen}
+          onClose={() => setReportOpen(false)}
+          onConfirm={sendReport}
+          sending={reportSending}
+          formData={reportForm}
+          setFormData={setReportForm}
+        />
 
         {error && (
           <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6">
@@ -173,7 +367,19 @@ const Dashboard = () => {
               <h3 className="text-lg font-semibold mb-4">Digital Tourist ID</h3>
               <div className="bg-[rgba(18,211,166,0.1)] border border-[rgba(18,211,166,0.3)] rounded-lg p-4">
                 <p className="text-gray-400 text-xs mb-2">User ID</p>
-                <p className="text-white font-mono text-sm break-all">{user?.uid?.substring(0, 20)}...</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-white font-mono text-sm break-all" title={user?.uid}>{user?.uid}</p>
+                  {user?.uid && (
+                    <button
+                      type="button"
+                      onClick={async () => { try { await navigator.clipboard.writeText(user.uid); } catch {} }}
+                      className="inline-flex items-center gap-1 text-[rgba(18,211,166,1)] hover:text-[rgba(18,211,166,0.8)] transition"
+                      title="Copy User ID"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -181,26 +387,11 @@ const Dashboard = () => {
             <div className="border-t border-[rgba(18,211,166,0.2)] pt-6 mt-6">
               <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
               <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between bg-[rgba(2,16,42,0.8)] rounded p-3">
-                  <span className="text-gray-400">Name</span>
-                  <span className="text-white">{profileLoading ? "…" : profile?.name || "Not provided"}</span>
-                </div>
-                <div className="flex items-center justify-between bg-[rgba(2,16,42,0.8)] rounded p-3">
-                  <span className="text-gray-400">Email</span>
-                  <span className="text-white break-all">{user?.email}</span>
-                </div>
-                <div className="flex items-center justify-between bg-[rgba(2,16,42,0.8)] rounded p-3">
-                  <span className="text-gray-400">Phone</span>
-                  <span className="text-white">{profileLoading ? "…" : profile?.phone || "Not provided"}</span>
-                </div>
-                <div className="flex items-center justify-between bg-[rgba(2,16,42,0.8)] rounded p-3">
-                  <span className="text-gray-400">Nationality</span>
-                  <span className="text-white">{profileLoading ? "…" : profile?.nationality || "Not provided"}</span>
-                </div>
-                <div className="flex items-center justify-between bg-[rgba(2,16,42,0.8)] rounded p-3">
-                  <span className="text-gray-400">Destination</span>
-                  <span className="text-white">{profileLoading ? "…" : profile?.destination || "Not provided"}</span>
-                </div>
+                <FieldRow label="Name" value={profile?.name} loading={profileLoading} copyable />
+                <FieldRow label="Email" value={user?.email} loading={false} copyable />
+                <FieldRow label="Phone" value={profile?.phone} loading={profileLoading} copyable />
+                <FieldRow label="Nationality" value={profile?.nationality} loading={profileLoading} />
+                <FieldRow label="Destination" value={profile?.destination} loading={profileLoading} />
               </div>
             </div>
 
@@ -211,15 +402,9 @@ const Dashboard = () => {
                 ID Information
               </h3>
               <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between bg-[rgba(2,16,42,0.8)] rounded p-3">
-                  <span className="text-gray-400">ID Type</span>
-                  <span className="text-white">{profileLoading ? "…" : profile?.idType || "Not provided"}</span>
-                </div>
-                <div className="flex items-center justify-between bg-[rgba(2,16,42,0.8)] rounded p-3">
-                  <span className="text-gray-400">ID Number</span>
-                  <span className="text-white">{profileLoading ? "…" : profile?.idNumber || "Not provided"}</span>
-                </div>
-                {profile?.idDocumentUrl && (
+                <FieldRow label="ID Type" value={profile?.idType} loading={profileLoading} />
+                <FieldRow label="ID Number" value={profile?.idNumber} loading={profileLoading} copyable />
+                {profile?.idDocumentUrl ? (
                   <a
                     href={profile.idDocumentUrl}
                     target="_blank"
@@ -228,6 +413,8 @@ const Dashboard = () => {
                   >
                     View Uploaded ID Document
                   </a>
+                ) : (
+                  <div className="text-xs text-gray-400">No ID document uploaded</div>
                 )}
               </div>
             </div>
@@ -330,6 +517,120 @@ const Dashboard = () => {
               <p className="text-gray-300">{new Date().toLocaleDateString()}</p>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Lightweight modal component for SOS confirmation
+const SosModal = ({ open, onClose, onConfirm, sending, hasLocation }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative z-10 w-[90%] max-w-md bg-[rgba(8,12,22,0.98)] border border-red-500/40 rounded-xl p-6 shadow-[0_0_30px_rgba(239,68,68,0.3)]">
+        <div className="flex items-center gap-2 text-red-400 mb-3">
+          <AlertTriangle className="w-5 h-5" />
+          <h4 className="text-lg font-semibold">Confirm SOS Alert</h4>
+        </div>
+        <p className="text-gray-300 mb-4">
+          This will send an emergency alert with your account details{hasLocation ? " and current location" : ""}. Only use this if you are in danger.
+        </p>
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={sending}
+            className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-800 disabled:opacity-60"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={sending}
+            className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-60 font-semibold"
+          >
+            {sending ? "Sending..." : "Send SOS"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Report submission modal component
+const ReportModal = ({ open, onClose, onConfirm, sending, formData, setFormData }) => {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className="relative z-10 w-[90%] max-w-md bg-[rgba(8,12,22,0.98)] border border-orange-500/40 rounded-xl p-6 shadow-[0_0_30px_rgba(234,88,12,0.3)] max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center gap-2 text-orange-400 mb-4">
+          <Flag className="w-5 h-5" />
+          <h4 className="text-lg font-semibold">Submit Report</h4>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-gray-300 text-sm mb-2">Report Title *</label>
+            <input
+              type="text"
+              placeholder="Brief title of your report"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              disabled={sending}
+              className="w-full bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[rgba(18,211,166,0.6)]"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-gray-300 text-sm mb-2">Category</label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              disabled={sending}
+              className="w-full bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg px-3 py-2 text-white focus:outline-none focus:border-[rgba(18,211,166,0.6)]"
+            >
+              <option value="general">General</option>
+              <option value="safety">Safety Issue</option>
+              <option value="harassment">Harassment</option>
+              <option value="scam">Scam/Fraud</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-gray-300 text-sm mb-2">Description</label>
+            <textarea
+              placeholder="Describe your report in detail..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              disabled={sending}
+              rows={4}
+              className="w-full bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg px-3 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-[rgba(18,211,166,0.6)] resize-none"
+            />
+          </div>
+        </div>
+        
+        <div className="flex justify-end gap-3 mt-6">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={sending}
+            className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-800 disabled:opacity-60"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={sending || !formData.title.trim()}
+            className="px-4 py-2 rounded-lg bg-orange-600 hover:bg-orange-700 disabled:opacity-60 font-semibold"
+          >
+            {sending ? "Submitting..." : "Submit Report"}
+          </button>
         </div>
       </div>
     </div>
