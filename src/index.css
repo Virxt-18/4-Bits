@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
   --gradient-hero: linear-gradient(135deg, rgba(94, 234, 212, 1) 0%, rgba(110, 231, 183, 1) 50%, rgb(60, 114, 251) 100%);
@@ -94,4 +95,6 @@ body {
 
 .hero-bg {
   opacity: 1 !important;
+  visibility: visible !important;
 }
+ 

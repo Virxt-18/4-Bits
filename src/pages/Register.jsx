@@ -1,9 +1,16 @@
 import { useState } from "react";
-import { Shield, ArrowLeft, User, Phone, Mail, MapPin, CreditCard, Upload, LogIn, UserPlus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Shield, ArrowLeft, User, Phone, Mail, MapPin, CreditCard, Upload, LogIn, UserPlus, Loader } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db, storage } from "../firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState("options"); // "options", "login", "register"
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -54,27 +61,76 @@ const Register = () => {
     }));
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login submitted:", loginData);
-    alert("Login successful!");
+    setLoading(true);
+    setError("");
+    
+    try {
+      await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
+      console.log("Login successful!");
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+    
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match!");
+      setLoading(false);
       return;
     }
-    console.log("Registration submitted:", formData);
-    alert("Registration submitted successfully!");
+    
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const uid = userCredential.user.uid;
+
+      let idDocumentUrl = "";
+      if (formData.idDocument) {
+        try {
+          const storageRef = ref(storage, `ids/${uid}/${formData.idDocument.name}`);
+          await uploadBytes(storageRef, formData.idDocument);
+          idDocumentUrl = await getDownloadURL(storageRef);
+        } catch (uploadErr) {
+          console.error("ID document upload failed:", uploadErr);
+        }
+      }
+
+      await setDoc(doc(db, "users", uid), {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        nationality: formData.nationality,
+        idType: formData.idType,
+        idNumber: formData.idNumber,
+        destination: formData.destination,
+        idDocumentUrl,
+        createdAt: serverTimestamp(),
+      });
+
+      console.log("Registration successful and profile saved!");
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err.message);
+      console.error("Registration error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
-// Options View
+
+  // Options View
   if (view === "options") {
     return (
       <div className="min-h-screen bg-[rgba(2,16,42,1)] flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-2xl">
-          {/* Back button */}
           <Link 
             to="/" 
             className="inline-flex items-center gap-2 text-white hover:text-[rgba(18,211,166,1)] transition mb-6"
@@ -83,21 +139,17 @@ const Register = () => {
             <span>Back to Home</span>
           </Link>
 
-          {/* Options Card */}
           <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
-            {/* Header */}
             <div className="flex items-center justify-center gap-3 mb-8">
               <Shield className="w-10 h-10 text-[rgba(18,211,166,1)]" />
-              <h1 className="text-3xl font-bold text-gradient nb">Welcome</h1>
+              <h1 className="text-3xl font-bold text-white">Welcome</h1>
             </div>
 
             <p className="text-center text-white text-lg mb-8">
               Choose an option to continue
             </p>
 
-            {/* Options */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Login Option */}
               <button
                 onClick={() => setView("login")}
                 className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,211,166,0.3)] hover:border-[rgba(18,211,166,1)] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
@@ -113,7 +165,6 @@ const Register = () => {
                 </div>
               </button>
 
-              {/* Register Option */}
               <button
                 onClick={() => setView("register")}
                 className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,211,166,0.3)] hover:border-[rgba(18,211,166,1)] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
@@ -140,7 +191,6 @@ const Register = () => {
     return (
       <div className="min-h-screen bg-[rgba(2,16,42,1)] flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
-          {/* Back button */}
           <button
             onClick={() => setView("options")}
             className="inline-flex items-center gap-2 text-white hover:text-[rgba(18,211,166,1)] transition mb-6"
@@ -148,46 +198,20 @@ const Register = () => {
             <ArrowLeft className="w-5 h-5" />
             <span>Back</span>
           </button>
-assword */
-              <div>
-                <label className="block text-white mb-2 text-sm font-medium">Password *</label>
-                <input
-                  type="password"
-                  name="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
-                  placeholder="Create a password"
-                />
-              </div>
 
-              {/* Confirm Password */}
-              <div>
-                <label className="block text-white mb-2 text-sm font-medium">Confirm Password *</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
-                  placeholder="Confirm your password"
-                />
-              </div>
-
-              {/* P
-          {/* Login Card */}
           <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
-            {/* Header */}
             <div className="flex items-center justify-center gap-3 mb-8">
               <LogIn className="w-10 h-10 text-[rgba(18,211,166,1)]" />
-              <h1 className="text-3xl font-bold text-gradient nb">Login</h1>
+              <h1 className="text-3xl font-bold text-white">Login</h1>
             </div>
 
-            {/* Login Form */}
             <form onSubmit={handleLoginSubmit} className="space-y-6">
-              {/* Email */}
+              {error && (
+                <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+
               <div>
                 <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
                   <Mail className="w-4 h-4" />
@@ -204,7 +228,6 @@ assword */
                 />
               </div>
 
-              {/* Password */}
               <div>
                 <label className="block text-white mb-2 text-sm font-medium">Password</label>
                 <input
@@ -218,15 +241,21 @@ assword */
                 />
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6"
+                disabled={loading}
+                className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6 flex items-center justify-center gap-2"
               >
-                Login
+                {loading ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </button>
 
-              {/* Register Link */}
               <p className="text-center text-gray-400 text-sm mt-4">
                 Don't have an account?{" "}
                 <button
@@ -248,7 +277,6 @@ assword */
   return (
     <div className="min-h-screen bg-[rgba(2,16,42,1)] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-2xl">
-        {/* Back button */}
         <button
           onClick={() => setView("options")}
           className="inline-flex items-center gap-2 text-white hover:text-[rgba(18,211,166,1)] transition mb-6"
@@ -257,24 +285,25 @@ assword */
           <span>Back</span>
         </button>
 
-        {/* Registration Card */}
         <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
-          {/* Header */}
           <div className="flex items-center justify-center gap-3 mb-8">
             <Shield className="w-10 h-10 text-[rgba(18,211,166,1)]" />
-            <h1 className="text-3xl font-bold text-gradient nb">Tourist Registration</h1>
+            <h1 className="text-3xl font-bold text-white">Tourist Registration</h1>
           </div>
 
-          {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Personal Information */}
+            {error && (
+              <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <User className="w-5 h-5 text-[rgba(18,211,166,1)]" />
                 Personal Information
               </h2>
 
-              {/* Name */}
               <div>
                 <label className="block text-white mb-2 text-sm font-medium">Full Name *</label>
                 <input
@@ -288,7 +317,6 @@ assword */
                 />
               </div>
 
-              {/* Email */}
               <div>
                 <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
                   <Mail className="w-4 h-4" />
@@ -305,7 +333,32 @@ assword */
                 />
               </div>
 
-              {/* Phone */}
+              <div>
+                <label className="block text-white mb-2 text-sm font-medium">Password *</label>
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  placeholder="Create a password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-white mb-2 text-sm font-medium">Confirm Password *</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  placeholder="Confirm your password"
+                />
+              </div>
+
               <div>
                 <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
                   <Phone className="w-4 h-4" />
@@ -322,7 +375,6 @@ assword */
                 />
               </div>
 
-              {/* Nationality */}
               <div>
                 <label className="block text-white mb-2 text-sm font-medium">Nationality *</label>
                 <input
@@ -337,14 +389,12 @@ assword */
               </div>
             </div>
 
-            {/* ID Information */}
             <div className="space-y-4 pt-4 border-t border-[rgba(18,211,166,0.2)]">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <CreditCard className="w-5 h-5 text-[rgba(18,211,166,1)]" />
                 ID Information
               </h2>
 
-              {/* ID Type */}
               <div>
                 <label className="block text-white mb-2 text-sm font-medium">ID Type *</label>
                 <select
@@ -361,7 +411,6 @@ assword */
                 </select>
               </div>
 
-              {/* ID Number */}
               <div>
                 <label className="block text-white mb-2 text-sm font-medium">ID Number *</label>
                 <input
@@ -375,7 +424,6 @@ assword */
                 />
               </div>
 
-              {/* Upload ID Document */}
               <div>
                 <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
                   <Upload className="w-4 h-4" />
@@ -398,7 +446,6 @@ assword */
               </div>
             </div>
 
-            {/* Destination */}
             <div className="pt-4 border-t border-[rgba(18,211,166,0.2)]">
               <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
@@ -415,15 +462,21 @@ assword */
               />
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6"
+              disabled={loading}
+              className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6 flex items-center justify-center gap-2"
             >
-              Complete Registration
+              {loading ? (
+                <>
+                  <Loader className="w-5 h-5 animate-spin" />
+                  Registering...
+                </>
+              ) : (
+                "Complete Registration"
+              )}
             </button>
 
-            {/* Login Link */}
             <p className="text-center text-gray-400 text-sm mt-4">
               Already have an account?{" "}
               <button
