@@ -28,46 +28,51 @@ const FEATURES = [
 export default function Hero() {
 
   const bgLayerRef = useRef(null);
-  const contentRef = useRef(null);
+  const desktopContentRef = useRef(null);
+  const mobileContentRef = useRef(null);
 
   useEffect(() => {
     // Background zoom ONLY (does not affect layout)
-    gsap.fromTo(
-      bgLayerRef.current,
-      { scale: 1 },
-      {
-        scale: 1.15,
-        ease: "power2.out",
-        transformOrigin: "center center",
-        scrollTrigger: {
-          trigger: contentRef.current,
-          start: "top top",
-          end: "+=400",
-          scrub: true,
+    if (desktopContentRef.current && bgLayerRef.current) {
+      gsap.to(
+        bgLayerRef.current,
+        {
+          scale: 1.15,
+          ease: "power2.out",
+          transformOrigin: "center center",
+          scrollTrigger: {
+            trigger: desktopContentRef.current,
+            start: "top top",
+            end: "+=400",
+            scrub: true,
+          }
         }
-      }
-    );
+      );
 
-    // Content float upward (transform-only, no reflow)
-    gsap.fromTo(
-      contentRef.current,
-      { y: 0 },
-      {
-        y: -120,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: contentRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
+      // Content float upward (transform-only, no reflow)
+      gsap.to(
+        desktopContentRef.current,
+        {
+          y: -120,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: desktopContentRef.current,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+          }
         }
-      }
-    );
+      );
+    }
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
   }, []);
 
   return (
     <>
-      <div ref={bgLayerRef} className="w-screen h-screen relative
+      <div ref={bgLayerRef} className="hero-bg w-screen h-screen relative
               bg-[url('images/bg.jpg')]
               bg-cover
               bg-no-repeat bg-bottom
@@ -77,7 +82,7 @@ export default function Hero() {
         <div class="absolute w-[clamp(200px,40vw,1600px)] h-[clamp(200px,40vw,1600px)] rounded-full pulse-glow
     bg-[radial-gradient(circle,rgba(0,200,255,0.2)_0%,rgba(0,200,255,0.1)_30%,transparent_70%)] opacity-30">
         </div>
-        <div ref={contentRef} className="relative max-md:hidden perspective w-full h-full flex items-center justify-center">
+        <div ref={desktopContentRef} className="hero-content relative max-md:hidden perspective w-full h-full flex items-center justify-center">
           
           <div className="tilt relative w-full h-full flex items-center justify-center">
             <div className="absolute no-tilt z-10 top-60 overflow-hidden pointer-events-none select-none text-white text-[clamp(45px,7vw,70px)] flex justify-around items-center font-bold px-8 flex-col rounded-3xl scale-95 text-center leading-25">
@@ -110,7 +115,7 @@ export default function Hero() {
             </div>
           </div>
         </div>
-        <div ref={contentRef} className="relative hidden max-md:flex flex-col w-full h-full items-center pt-30">
+        <div ref={mobileContentRef} className="hero-content relative hidden max-md:flex flex-col w-full h-full items-center pt-30">
           <div className="flex flex-col items-center text-[clamp(30px,5vw,60px)] mb-3">
             <div className="bg-[rgba(8,12,22,0.9)] shadow-[0_0_15px_rgba(38,92,217,0.5)] rounded-xl px-4 border border-[rgba(18,211,166,0.5)]"><p className="text-gradient nb tracking-wide">TripShield</p></div>
               <div className="text-shadow-[2px_2px_10px_rgba(0,0,0,.6)]">Travel Safely.</div>
@@ -131,7 +136,7 @@ export default function Hero() {
 </div>
         </div>
       </div>
-      <div className="w-auto max-[420px]:w-screen absolute bottom-1 min-[450px]:bottom-8 h-37 z-51 -translate-x-1/2 left-1/2 flex flex-col">
+      <div className="hero-content w-auto max-[420px]:w-screen absolute bottom-1 min-[450px]:bottom-8 h-37 z-[9998] -translate-x-1/2 left-1/2 flex flex-col" style={{opacity: 1, visibility: 'visible'}}>
         <p className="text-[clamp(17px,4vw,40px)] text-center font-bold text-shadow-[2px_2px_10px_rgba(0,0,0,.6)]">
           Begin your safe journey
         </p>

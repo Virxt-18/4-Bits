@@ -7,45 +7,51 @@ export default function Loading({ onFinish }) {
   const overlayRef = useRef(null);
 
   useEffect(() => {
-    // Lock scroll
-    const scrollY = window.scrollY;
-    document.body.style.position = "fixed";
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = "0";
-    document.body.style.right = "0";
-    document.body.style.width = "100%";
+    // Don't lock scroll, just disable scrolling with overflow
+    document.body.style.overflow = "hidden";
 
-    const img = new Image();
-    img.src = "/images/bg.jpg";
-
-    img.onload = () => {
-      gsap.to({}, {
-        duration: 2,
-        onUpdate() {
-          setProgress(this.progress() * 100);
-        },
+    const startExit = () => {
+      gsap.to(overlayRef.current, {
+        y: "-100%",
+        opacity: 0,
+        duration: 0.6,
+        delay: 0.15,
+        ease: "power2.inOut",
         onComplete: () => {
-          // Animate overlay out
-          gsap.to(overlayRef.current, {
-            y: "-100%",
-            duration: 1,
-            ease: "power3.inOut",
-            onComplete: () => {
-              // Unlock scroll
-              document.body.style.position = "";
-              document.body.style.top = "";
-              window.scrollTo(0, scrollY); // restore scroll
-              if (onFinish) onFinish();
-            }
-          });
+          document.body.style.overflow = "";
+          if (onFinish) onFinish();
         }
       });
     };
 
+    const runProgress = () => {
+      gsap.to({}, {
+        duration: 1.1,
+        onUpdate() {
+          setProgress(this.progress() * 100);
+        },
+        onComplete: startExit
+      });
+    };
+
+    const img = new Image();
+    img.src = "/images/bg.jpg";
+
+    let timeoutId = setTimeout(runProgress, 1200); // fallback if image is slow
+
+    img.onload = () => {
+      clearTimeout(timeoutId);
+      runProgress();
+    };
+
+    img.onerror = () => {
+      clearTimeout(timeoutId);
+      runProgress();
+    };
+
     return () => {
       // Cleanup
-      document.body.style.position = "";
-      document.body.style.top = "";
+      document.body.style.overflow = "";
     };
   }, [onFinish]);
 

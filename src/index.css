@@ -85,3 +85,13 @@ body {
 .animate-rotate {
   animation: rotateRing 22s linear infinite;
 }
+
+/* Hero section - ensure visible on load */
+.hero-content {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.hero-bg {
+  opacity: 1 !important;
+}
