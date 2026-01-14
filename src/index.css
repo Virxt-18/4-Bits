@@ -1,1 +1,87 @@
 @import "tailwindcss";
+
+:root {
+  --gradient-hero: linear-gradient(135deg, rgba(94, 234, 212, 1) 0%, rgba(110, 231, 183, 1) 50%, rgb(60, 114, 251) 100%);
+}
+
+@font-face {
+  font-family: "Nunito";
+  src: url("./fonts/Nunito-VariableFont_wght.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "NunitoBold";
+  src: url("./fonts/Nunito-ExtraBold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+.nb {
+  font-family: "NunitoBold", sans-serif;
+}
+
+* {
+  scroll-behavior: smooth !important;
+  font-family: "Nunito", sans-serif;
+}
+
+*::selection {
+  background-color: rgba(0,255,255,0.5);
+  color: rgba(2,16,42,1);
+}
+
+body {
+  background-color: rgba(2,16,42,1);
+  color: white;
+  overflow-x: hidden;
+}
+
+.text-gradient {
+  background: var(--gradient-hero);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.perspective {
+  perspective: 1000px;
+}
+
+.tilt {
+  transform-style: preserve-3d;
+  transform: rotateX(-16deg);
+}
+
+.no-tilt {
+  transform-style: preserve-3d;
+  transform: rotateX(16deg);
+}
+
+.carousel {
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+
+.card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  translate: -50% -50%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #111;
+  user-select: none;
+}
+
+@keyframes rotateRing {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+.animate-rotate {
+  animation: rotateRing 22s linear infinite;
+}
