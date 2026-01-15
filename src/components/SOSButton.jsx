@@ -48,10 +48,13 @@ const SOSButton = () => {
         description: "Emergency SOS Alert",
       };
 
-      await apiClient.post("/api/admin/sos-alerts", sosData);
+      console.log("📤 Sending SOS Alert with data:", sosData);
+      const response = await apiClient.post("/api/admin/sos-alerts", sosData);
+      console.log("✅ SOS Alert sent successfully! Response:", response.data);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (e) {
+      console.error("❌ Failed to send SOS:", e);
       setError(e.response?.data?.error || "Failed to send SOS alert");
     } finally {
       setLoading(false);

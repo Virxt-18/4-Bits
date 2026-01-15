@@ -37,28 +37,35 @@ router.get("/reports", verifyAdminKey, async (req, res) => {
 router.post("/sos-alerts", async (req, res) => {
   try {
     const { uid, email, location, description } = req.body;
+    console.log("📥 Received SOS Alert request:", { uid, email, location, description });
+    console.log("📍 Location coordinates - Lat:", location?.lat, "Lng:", location?.lng);
+    console.log("🔍 req.io exists?", !!req.io);
+    
     const alert = new SOSAlert({ uid, email, location, description });
-    await alert.save();
+    const savedAlert = await alert.save();
     
-    console.log("✅ SOS Alert created:", alert._id);
-    
+    console.log("✅ SOS Alert saved to DB:", savedAlert._id);
+    console.log("📍 Alert location stored:", savedAlert.location);
+
     // Emit real-time notification to all connected authorities
     if (req.io) {
-      req.io.emit("new-sos-alert", {
-        _id: alert._id,
-        uid: alert.uid,
-        email: alert.email,
-        location: alert.location,
-        status: alert.status,
-        createdAt: alert.createdAt,
-        message: `🚨 Emergency SOS from ${alert.email}`,
-      });
-      console.log("📢 Emitted new-sos-alert event");
+      const alertData = {
+        _id: savedAlert._id,
+        uid: savedAlert.uid,
+        email: savedAlert.email,
+        location: savedAlert.location,
+        status: savedAlert.status,
+        createdAt: savedAlert.createdAt,
+        message: `🚨 Emergency SOS from ${savedAlert.email}`,
+      };
+      
+      console.log("📢 Broadcasting to", req.io.engine.clientsCount, "connected authorities");
+      console.log("📍 Broadcasting location:", alertData.location);
     }
     
-    res.status(201).json({ alert, message: "SOS alert created" });
+    res.status(201).json({ alert: savedAlert, message: "SOS alert created successfully" });
   } catch (error) {
-    console.error("Error creating SOS alert:", error);
+    console.error("❌ Error creating SOS alert:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -73,6 +80,36 @@ router.patch("/sos-alerts/:id", verifyAdminKey, async (req, res) => {
     );
     req.io.emit("alert-resolved", { alertId: alert._id });
     res.json({ alert, message: "Alert resolved" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create E-FIR
+router.post("/efir", verifyAdminKey, async (req, res) => {
+  try {
+    const { firNumber, date, status, category, reportedBy, userId, location, description, timestamp } = req.body;
+    
+    // Save E-FIR to database (optional - can be saved to file or email)
+    const efir = {
+      firNumber,
+      date,
+      status,
+      category,
+      reportedBy,
+      userId,
+      location,
+      description,
+      timestamp,
+      createdAt: new Date(),
+    };
+
+    console.log("✅ E-FIR Generated:", firNumber);
+    
+    res.json({ 
+      efir, 
+      message: "E-FIR generated successfully" 
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

@@ -36,9 +36,11 @@ app.use("/api/admin", adminRoutes);
 // Socket.io connection handler
 io.on("connection", (socket) => {
   console.log("✅ Authority connected:", socket.id);
+  console.log("📊 Total connected clients:", io.engine.clientsCount);
   
   socket.on("disconnect", () => {
     console.log("❌ Authority disconnected:", socket.id);
+    console.log("📊 Total connected clients:", io.engine.clientsCount);
   });
 
   socket.on("error", (error) => {
