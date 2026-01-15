@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "leaflet/dist/leaflet.css";
 
 :root {
   --gradient-hero: linear-gradient(135deg, rgba(94, 234, 212, 1) 0%, rgba(110, 231, 183, 1) 50%, rgb(60, 114, 251) 100%);
@@ -87,14 +86,23 @@ body {
   animation: rotateRing 22s linear infinite;
 }
 
-/* Hero section - ensure visible on load */
-.hero-content {
-  opacity: 1 !important;
-  visibility: visible !important;
+.link {
+  position: relative;
+  text-decoration: none;
+  color: #fff;
 }
 
-.hero-bg {
-  opacity: 1 !important;
-  visibility: visible !important;
+.link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background-color: #3b82f6;
+  transition: width 0.3s ease;
 }
- 
+
+.link:hover::before {
+  width: 100%;
+}

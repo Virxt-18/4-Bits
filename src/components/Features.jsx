@@ -12,69 +12,54 @@ import {
   Radio,
   Shield
 } from "lucide-react";
+import { useTranslation } from "react-i18next"
 
 const features = [
   {
     icon: Fingerprint,
-    title: "Digital Tourist ID",
-    description: "Blockchain-secured digital IDs issued at airports, hotels, and check-posts with integrated KYC verification.",
-    highlights: ["Aadhaar/Passport Integration", "Trip-Duration Validity", "Emergency Contacts"],
-    color: "primary",
+    title: "id",
+    description: "idtext",
+    highlights: ["idaadhaar","idtrip","idemergency"],
+    color: "rgba(255, 151, 0,0.90)",
+    shadowColor: "rgba(255, 151, 0,0.40)"
   },
   {
     icon: Smartphone,
-    title: "Tourist Mobile App",
-    description: "Feature-rich mobile application with safety scoring, geo-fencing, and instant emergency communication.",
-    highlights: ["Panic Button", "Live Location Sharing", "Safety Score"],
-    color: "secondary",
+    title: "twa",
+    description: "twatext",
+    highlights: ["pb","lls","ss"],
+    color: "rgba(51, 102, 255,0.90)",
+    shadowColor: "rgba(51, 102, 255,0.40)"
   },
   {
     icon: Brain,
-    title: "AI Anomaly Detection",
-    description: "Advanced machine learning algorithms detect unusual patterns and trigger early interventions.",
-    highlights: ["Inactivity Detection", "Route Deviation Alerts", "Predictive Analysis"],
-    color: "success",
+    title: "anamoly",
+    description: "anamolytext" ,
+    highlights: ["anamolyid","anamolyrda","anamolypa"],
+    color: "rgba(255, 247, 59, 0.90)",
+    shadowColor: "rgba(255, 247, 59, 0.40)"
   },
   {
     icon: LayoutDashboard,
-    title: "Authority Dashboard",
-    description: "Comprehensive command center for real-time monitoring, response coordination, and incident management.",
-    highlights: ["Heat Maps", "E-FIR Generation", "Alert Management"],
-    color: "primary",
+    title: "ad",
+    description: "adtext",
+    highlights: ["adhm", "adefir", "adam"],
+    color: "rgba(112, 251, 255,0.90)",
+    shadowColor: "rgba(112, 251, 255,0.40)"
   },
 ];
 
 const additionalFeatures = [
-  { icon: Globe, title: "Multilingual Support", description: "10+ Indian languages + English" },
-  { icon: Lock, title: "End-to-End Encryption", description: "Complete data protection compliance" },
-  { icon: MapPin, title: "Geo-Fencing", description: "High-risk zone alerts" },
-  { icon: AlertTriangle, title: "Distress Detection", description: "Behavioral anomaly flags" },
-  { icon: Bell, title: "Instant Alerts", description: "Police & emergency contacts" },
-  { icon: FileText, title: "Automated E-FIR", description: "Quick incident reporting" },
+  { icon: Globe, title: "ms", description: "mstext", color: "rgba(51, 102, 255,0.90)" },
+  { icon: Lock, title: "eee", description: "eeetext", color: "rgba(18, 211, 166,0.90)" },
+  { icon: MapPin, title: "gf", description: "gftext", color: "rgba(147, 238, 72,0.90)" },
+  { icon: AlertTriangle, title: "dd", description: "ddtext", color: "rgba(255, 0, 50,0.90)" },
+  { icon: Bell, title: "ia", description: "iatext", color: "rgba(172, 112, 254,0.90)" },
+  { icon: FileText, title: "aefir", description: "aefirtext", color: "rgba(255, 151, 0,0.90)" },
 ];
 
-const colorClasses = {
-  primary: {
-    bg: "bg-primary/10",
-    border: "border-primary/20",
-    text: "text-primary",
-    glow: "shadow-primary/20",
-  },
-  secondary: {
-    bg: "bg-secondary/10",
-    border: "border-secondary/20",
-    text: "text-secondary",
-    glow: "shadow-secondary/20",
-  },
-  success: {
-    bg: "bg-success/10",
-    border: "border-success/20",
-    text: "text-success",
-    glow: "shadow-success/20",
-  },
-};
-
 const Features = () => {
+  const { t } = useTranslation();
   return (
     <section id="features" className="py-24 md:py-32 relative overflow-hidden">
       {/* Background Elements */}
@@ -84,42 +69,42 @@ const Features = () => {
       <div className="container mx-auto px-4 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 md:mb-20">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(18,211,166,0.5)] mb-6">
             <Shield className="w-4 h-4 text-primary" />
-              <span className="block text-sm text-muted-foreground">Core Platform Features</span>
+              <span className="block text-sm text-muted-foreground">{t("cpf")}</span>
           </div>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            Complete Safety
-            <span className="text-gradient-primary"> Ecosystem</span>
+          <h2 className="text-gradient text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+            {t("cfe")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            A comprehensive, privacy-first system designed to protect tourists while respecting their travel experience.
+            {t("cfetext")}
           </p>
         </div>
 
         {/* Main Features Grid */}
         <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-16">
           {features.map((feature, index) => {
-            const colors = colorClasses[feature.color];
             return (
               <div
                 key={index}
-                className="group relative bg-gradient-card rounded-2xl p-6 md:p-8 border border-border/50 hover:border-primary/30 transition-all duration-500 hover:-translate-y-1 shadow-card hover:shadow-elevated"
+                className="group relative bg-gradient-card rounded-2xl p-6 md:p-8 border border-border/50 transition-all duration-200 border-(--card-color) hover:-translate-y-1 hover:bg-(--shadow-color)"
+                style={{
+                  '--card-color': feature.color,
+                  '--shadow-color': feature.shadowColor
+                }}
               >
-                {/* Glow Effect on Hover */}
-                <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${colors.glow} shadow-2xl blur-xl -z-10`} />
                 
                 {/* Icon */}
-                <div className={`w-14 h-14 rounded-xl ${colors.bg} border ${colors.border} flex items-center justify-center mb-6`}>
-                  <feature.icon className={`w-7 h-7 ${colors.text}`} />
+                <div className={`w-14 h-14 rounded-xl  border border-(--card-color) bg-(--shadow-color)  flex items-center justify-center mb-6`}>
+                  <feature.icon className={`w-7 h-7 text-white`} />
                 </div>
 
                 {/* Content */}
                 <h3 className="font-display text-xl md:text-2xl font-bold mb-3 text-foreground">
-                  {feature.title}
+                  {t(feature.title)}
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  {feature.description}
+                  {t(feature.description)}
                 </p>
 
                 {/* Highlights */}
@@ -127,15 +112,15 @@ const Features = () => {
                   {feature.highlights.map((highlight, hIndex) => (
                     <span
                       key={hIndex}
-                      className={`px-3 py-1.5 rounded-full text-sm ${colors.bg} ${colors.text} border ${colors.border}`}
+                      className={`px-3 py-1.5 rounded-full border-(--card-color) text-sm border`}
                     >
-                      {highlight}
+                      {t(highlight)}
                     </span>
                   ))}
                 </div>
 
                 {/* Decorative Corner */}
-                <div className={`absolute top-0 right-0 w-20 h-20 ${colors.bg} rounded-bl-3xl rounded-tr-2xl opacity-50`} />
+                <div className={`absolute top-0 right-0 w-20 h-20 rounded-bl-3xl rounded-tr-2xl opacity-50`} />
               </div>
             );
           })}
@@ -149,10 +134,13 @@ const Features = () => {
               className="group glass rounded-xl p-4 text-center hover:bg-primary/5 transition-all duration-300 cursor-default"
             >
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                <feature.icon className="w-5 h-5 text-primary" />
+                <feature.icon className="w-5 h-5 text-(--card-color)"
+                style={{
+                  '--card-color': feature.color
+                }}/>
               </div>
-              <h4 className="font-medium text-sm text-foreground mb-1">{feature.title}</h4>
-              <p className="text-xs text-muted-foreground">{feature.description}</p>
+              <h4 className="font-medium text-sm text-foreground mb-1">{t(feature.title)}</h4>
+              <p className="text-xs text-muted-foreground">{t(feature.description)}</p>
             </div>
           ))}
         </div>

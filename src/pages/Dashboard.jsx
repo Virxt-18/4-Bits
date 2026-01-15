@@ -559,7 +559,7 @@ const Dashboard = () => {
 const SosModal = ({ open, onClose, onConfirm, sending, hasLocation }) => {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="relative z-10 w-[90%] max-w-md bg-[rgba(8,12,22,0.98)] border border-red-500/40 rounded-xl p-6 shadow-[0_0_30px_rgba(239,68,68,0.3)]">
         <div className="flex items-center gap-2 text-red-400 mb-3">

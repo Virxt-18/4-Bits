@@ -6,7 +6,6 @@ const languages = [
   { code: "hi", name: "Hindi", nativeName: "हिंदी" },
   { code: "as", name: "Assamese", nativeName: "অসমীয়া" },
   { code: "bn", name: "Bengali", nativeName: "বাংলা" },
-  { code: "bt", name: "Bhutia", nativeName: "Bhutia" },
   { code: "bo", name: "Bodo", nativeName: "बड़ो" },
   { code: "ks", name: "Khasi", nativeName: "Khasi" },
   { code: "ko", name: "Kokborok", nativeName: "Kokborok" },
@@ -20,9 +19,9 @@ export default function Translate({ language, changeLanguage }) {
   const currentLang = languages.find(lang => lang.code === language)
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-2">
+    <div className="fixed bottom-6 right-6 z-9999 flex flex-col items-end gap-2">
       {isOpen && (
-        <div className="absolute bottom-20 right-0 bg-white dark:bg-gray-900 border-2 border-blue-500 rounded-xl shadow-2xl p-3 w-56 max-h-[420px] overflow-y-auto z-[10000]">
+        <div className="absolute bottom-20 right-0 bg-white dark:bg-gray-900 border-2 border-blue-500 rounded-xl shadow-2xl p-3 w-56 max-h-105 overflow-y-auto z-10000">
           <div className="mb-2 pb-2 border-b border-gray-300 dark:border-gray-700">
             <p className="text-sm font-bold text-gray-700 dark:text-gray-200 px-2">Select Language</p>
           </div>
@@ -30,9 +29,11 @@ export default function Translate({ language, changeLanguage }) {
             <button
               key={lang.code}
               onClick={() => {
-                changeLanguage(lang.code)
-                setIsOpen(false)
-              }}
+  console.log("Saving lang:", lang.code)
+  localStorage.setItem("lang", lang.code)
+  changeLanguage(lang.code)
+  setIsOpen(false)
+}}
               className={`w-full text-left px-3 py-2.5 rounded-lg transition-all mb-1 ${
                 language === lang.code
                   ? "bg-blue-500 text-white font-semibold shadow-md scale-105"
@@ -61,4 +62,3 @@ export default function Translate({ language, changeLanguage }) {
     </div>
   )
 }
-
