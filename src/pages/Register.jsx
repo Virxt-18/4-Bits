@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Shield, ArrowLeft, User, Phone, Mail, MapPin, CreditCard, Upload, LogIn, UserPlus, Loader } from "lucide-react";
+import { Shield, ArrowLeft, User, Phone, Mail, MapPin, LogIn, UserPlus, Loader } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db, storage } from "../firebase";
+import { auth, db } from "../firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const Register = () => {
   const navigate = useNavigate();
   const [view, setView] = useState("options"); // "options", "login", "register"
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -22,20 +22,9 @@ const Register = () => {
     nationality: "",
     password: "",
     confirmPassword: "",
-    idType: "",
-    idNumber: "",
     destination: "",
-    idDocument: null,
   });
 
-  const idTypes = [
-    "Passport",
-    "Aadhaar Card",
-    "Driving License",
-    "Voter ID",
-    "PAN Card",
-    "Other Government ID"
-  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,26 +42,36 @@ const Register = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    setFormData(prev => ({
-      ...prev,
-      idDocument: file
-    }));
-  };
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     
+    console.log("Starting login process for:", loginData.email);
+    
     try {
       await signInWithEmailAndPassword(auth, loginData.email, loginData.password);
       console.log("Login successful!");
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message);
       console.error("Login error:", err);
+      let errorMessage = err.message;
+      
+      // Provide more user-friendly error messages
+      if (err.code === 'auth/user-not-found') {
+        errorMessage = "No account found with this email. Please register first.";
+      } else if (err.code === 'auth/wrong-password') {
+        errorMessage = "Incorrect password. Please try again.";
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = "Invalid email address format.";
+      } else if (err.code === 'auth/network-request-failed') {
+        errorMessage = "Network error. Please check your internet connection.";
+      } else if (err.code === 'auth/invalid-credential') {
+        errorMessage = "Invalid email or password. Please try again.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -82,6 +81,10 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
+    
+    console.log("Starting registration process...");
+    console.log("Form data:", { ...formData, password: "***", confirmPassword: "***" });
     
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match!");
@@ -89,38 +92,51 @@ const Register = () => {
       return;
     }
     
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long!");
+      setLoading(false);
+      return;
+    }
+    
     try {
+      console.log("Creating user with email:", formData.email);
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const uid = userCredential.user.uid;
+      console.log("User created with UID:", uid);
 
-      let idDocumentUrl = "";
-      if (formData.idDocument) {
-        try {
-          const storageRef = ref(storage, `ids/${uid}/${formData.idDocument.name}`);
-          await uploadBytes(storageRef, formData.idDocument);
-          idDocumentUrl = await getDownloadURL(storageRef);
-        } catch (uploadErr) {
-          console.error("ID document upload failed:", uploadErr);
-        }
-      }
-
-      await setDoc(doc(db, "users", uid), {
+      console.log("Saving user profile to Firestore...");
+      const profileData = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
         nationality: formData.nationality,
-        idType: formData.idType,
-        idNumber: formData.idNumber,
         destination: formData.destination,
-        idDocumentUrl,
         createdAt: serverTimestamp(),
-      });
+      };
+      console.log("Profile data to save:", profileData);
+      
+      await setDoc(doc(db, "users", uid), profileData);
 
       console.log("Registration successful and profile saved!");
-      navigate("/dashboard");
+      setSuccess("Registration successful! Redirecting to dashboard...");
+      alert("Registration successful! Redirecting to dashboard...");
+      setTimeout(() => navigate("/dashboard"), 1200);
     } catch (err) {
-      setError(err.message);
       console.error("Registration error:", err);
+      let errorMessage = err.message;
+      
+      // Provide more user-friendly error messages
+      if (err.code === 'auth/email-already-in-use') {
+        errorMessage = "This email is already registered. Please login instead.";
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = "Invalid email address format.";
+      } else if (err.code === 'auth/weak-password') {
+        errorMessage = "Password is too weak. Please use at least 6 characters.";
+      } else if (err.code === 'auth/network-request-failed') {
+        errorMessage = "Network error. Please check your internet connection.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -298,6 +314,12 @@ const Register = () => {
               </div>
             )}
 
+            {success && (
+              <div className="bg-green-500/15 border border-green-500 text-green-300 px-4 py-3 rounded-lg text-sm">
+                {success}
+              </div>
+            )}
+
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <User className="w-5 h-5 text-[rgba(18,211,166,1)]" />
@@ -390,63 +412,6 @@ const Register = () => {
             </div>
 
             <div className="space-y-4 pt-4 border-t border-[rgba(18,211,166,0.2)]">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-[rgba(18,211,166,1)]" />
-                ID Information
-              </h2>
-
-              <div>
-                <label className="block text-white mb-2 text-sm font-medium">ID Type *</label>
-                <select
-                  name="idType"
-                  required
-                  value={formData.idType}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition cursor-pointer"
-                >
-                  <option value="">Select ID Type</option>
-                  {idTypes.map((type, index) => (
-                    <option key={index} value={type}>{type}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-white mb-2 text-sm font-medium">ID Number *</label>
-                <input
-                  type="text"
-                  name="idNumber"
-                  required
-                  value={formData.idNumber}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
-                  placeholder="Enter your ID number"
-                />
-              </div>
-
-              <div>
-                <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  Upload ID Document *
-                </label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept="image/*,.pdf"
-                    onChange={handleFileChange}
-                    required
-                    className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[rgba(18,211,166,0.2)] file:text-[rgba(18,211,166,1)] hover:file:bg-[rgba(18,211,166,0.3)] cursor-pointer"
-                  />
-                </div>
-                {formData.idDocument && (
-                  <p className="text-sm text-[rgba(18,211,166,1)] mt-2">
-                    Selected: {formData.idDocument.name}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-[rgba(18,211,166,0.2)]">
               <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Destination in Northeast India *

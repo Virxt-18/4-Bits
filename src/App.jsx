@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import AuthorityLogin from "./pages/AuthorityLogin";
+import AuthorityDashboard from "./pages/AuthorityDashboard";
 import NotFound from "./pages/NotFound";
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import Lenis from "lenis";
@@ -52,6 +54,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/authority-login" element={<AuthorityLogin />} />
+        <Route path="/authority-dashboard" element={<AuthorityDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

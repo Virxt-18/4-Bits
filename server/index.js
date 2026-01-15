@@ -8,6 +8,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY || "";
 
 // Middleware
 app.use(cors());
@@ -74,6 +75,23 @@ app.get('/api/sos-alerts/:uid', async (req, res) => {
   }
 });
 
+// Admin: get all alerts (no auth here; protect at gateway/firewall in production)
+app.get('/api/admin/sos-alerts', async (_req, res) => {
+  if (!ADMIN_API_KEY || _req.headers['x-admin-key'] !== ADMIN_API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const alerts = await db.collection('sos_alerts')
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+    res.json({ success: true, alerts });
+  } catch (error) {
+    console.error('Error fetching admin alerts:', error);
+    res.status(500).json({ error: 'Failed to fetch alerts' });
+  }
+});
+
 // Report endpoint
 app.post('/api/report', async (req, res) => {
   try {
@@ -119,6 +137,23 @@ app.get('/api/reports/:uid', async (req, res) => {
     res.json({ success: true, reports });
   } catch (error) {
     console.error('Error fetching reports:', error);
+    res.status(500).json({ error: 'Failed to fetch reports' });
+  }
+});
+
+// Admin: get all reports (no auth here; protect at gateway/firewall in production)
+app.get('/api/admin/reports', async (_req, res) => {
+  if (!ADMIN_API_KEY || _req.headers['x-admin-key'] !== ADMIN_API_KEY) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const reports = await db.collection('reports')
+      .find({})
+      .sort({ createdAt: -1 })
+      .toArray();
+    res.json({ success: true, reports });
+  } catch (error) {
+    console.error('Error fetching admin reports:', error);
     res.status(500).json({ error: 'Failed to fetch reports' });
   }
 });

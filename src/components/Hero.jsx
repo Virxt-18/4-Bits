@@ -1,8 +1,10 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Shield, Fingerprint, MapPin, Bell, Lock, Globe, LayoutDashboard, Users, Database, Brain } from "lucide-react";
+import { Shield, Fingerprint, MapPin, Bell, Lock, Globe, LayoutDashboard, Users, Database, Brain, KeyboardOff, BookDashed, BookDashedIcon } from "lucide-react";
 import { Link } from "react-router-dom";
+import { keyFromSelector } from "i18next";
+import Home from "../pages/Home";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -156,7 +158,7 @@ export default function Hero() {
             </span>
           </Link>
           <Link
-            to="/dashboard"
+            to="/authority-login"
             className="group h-12 w-47 max-[910px]:h-10 max-[910px]:w-45  relative overflow-hidden bg-[rgb(251,125,41)] border border-transparent text-white px-5 py-2 rounded-full font-semibold active:scale-95 active:opacity-80 hover:bg-[#15eefa] hover:text-[rgba(18,201,211,1)] transition duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-[0_5px_10px_rgba(0,0,0,1)] select-none"
           >
             {/* Top text (default) */}
@@ -174,4 +176,5 @@ export default function Hero() {
     </>
 
   );
-}
+  }
+

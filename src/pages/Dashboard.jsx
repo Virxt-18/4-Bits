@@ -6,7 +6,7 @@ import { LogOut, User, MapPin, Navigation, CreditCard, Copy, Check, AlertTriangl
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { sendSOSAlert } from "../api/sosAlert";
 import { submitReport } from "../api/reportAlert";
 
@@ -96,11 +96,27 @@ const Dashboard = () => {
         // Fetch profile
         (async () => {
           try {
+            console.log("Fetching profile for user:", currentUser.uid);
             const snap = await getDoc(doc(db, "users", currentUser.uid));
             if (snap.exists()) {
-              setProfile(snap.data());
+              const profileData = snap.data();
+              console.log("Profile data loaded:", profileData);
+              setProfile(profileData);
             } else {
-              setProfile(null);
+              console.log("No profile document found for user, creating a basic profile stub");
+              const stub = {
+                email: currentUser.email || "",
+                name: currentUser.displayName || "",
+                createdAt: serverTimestamp(),
+                idDocumentUrl: "",
+              };
+              try {
+                await setDoc(doc(db, "users", currentUser.uid), stub, { merge: true });
+                setProfile(stub);
+              } catch (writeErr) {
+                console.error("Failed to create profile stub:", writeErr);
+                setProfile(null);
+              }
             }
           } catch (e) {
             console.error("Failed to load profile:", e);
@@ -386,13 +402,23 @@ const Dashboard = () => {
             {/* Personal Information */}
             <div className="border-t border-[rgba(18,211,166,0.2)] pt-6 mt-6">
               <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
-              <div className="space-y-3 text-sm">
-                <FieldRow label="Name" value={profile?.name} loading={profileLoading} copyable />
-                <FieldRow label="Email" value={user?.email} loading={false} copyable />
-                <FieldRow label="Phone" value={profile?.phone} loading={profileLoading} copyable />
-                <FieldRow label="Nationality" value={profile?.nationality} loading={profileLoading} />
-                <FieldRow label="Destination" value={profile?.destination} loading={profileLoading} />
-              </div>
+              {profileLoading ? (
+                <div className="text-gray-400 text-sm">Loading profile...</div>
+              ) : (
+                <div className="space-y-3 text-sm">
+                  {!profile && (
+                    <div className="bg-yellow-500/15 border border-yellow-500 text-yellow-400 px-4 py-3 rounded-lg text-sm">
+                      <p className="font-semibold mb-1">Profile Not Found in Firestore</p>
+                      <p className="text-xs text-yellow-200">Showing account fallbacks. Please re-register to save full details.</p>
+                    </div>
+                  )}
+                  <FieldRow label="Name" value={profile?.name || user?.displayName} loading={profileLoading} copyable />
+                  <FieldRow label="Email" value={user?.email} loading={false} copyable />
+                  <FieldRow label="Phone" value={profile?.phone || user?.phoneNumber} loading={profileLoading} copyable />
+                  <FieldRow label="Nationality" value={profile?.nationality} loading={profileLoading} />
+                  <FieldRow label="Destination" value={profile?.destination} loading={profileLoading} />
+                </div>
+              )}
             </div>
 
             {/* ID Information */}
@@ -401,22 +427,28 @@ const Dashboard = () => {
                 <CreditCard className="w-5 h-5 text-[rgba(18,211,166,1)]" />
                 ID Information
               </h3>
-              <div className="space-y-3 text-sm">
-                <FieldRow label="ID Type" value={profile?.idType} loading={profileLoading} />
-                <FieldRow label="ID Number" value={profile?.idNumber} loading={profileLoading} copyable />
-                {profile?.idDocumentUrl ? (
-                  <a
-                    href={profile.idDocumentUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="block text-center bg-[rgba(18,211,166,0.2)] hover:bg-[rgba(18,211,166,0.3)] text-[rgba(18,211,166,1)] font-semibold py-2 px-4 rounded-lg transition"
-                  >
-                    View Uploaded ID Document
-                  </a>
-                ) : (
-                  <div className="text-xs text-gray-400">No ID document uploaded</div>
-                )}
-              </div>
+              {profileLoading ? (
+                <div className="text-gray-400 text-sm">Loading ID info...</div>
+              ) : !profile ? (
+                <div className="text-gray-400 text-sm">No profile data available</div>
+              ) : (
+                <div className="space-y-3 text-sm">
+                  <FieldRow label="ID Type" value={profile?.idType} loading={profileLoading} />
+                  <FieldRow label="ID Number" value={profile?.idNumber} loading={profileLoading} copyable />
+                  {profile?.idDocumentUrl ? (
+                    <a
+                      href={profile.idDocumentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block text-center bg-[rgba(18,211,166,0.2)] hover:bg-[rgba(18,211,166,0.3)] text-[rgba(18,211,166,1)] font-semibold py-2 px-4 rounded-lg transition"
+                    >
+                      View Uploaded ID Document
+                    </a>
+                  ) : (
+                    <div className="text-xs text-gray-400">No ID document uploaded</div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* GPS Tracking Controls */}
