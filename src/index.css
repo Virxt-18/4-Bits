@@ -85,3 +85,24 @@ body {
 .animate-rotate {
   animation: rotateRing 22s linear infinite;
 }
+
+.link {
+  position: relative;
+  text-decoration: none;
+  color: #fff;
+}
+
+.link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 2px;
+  background-color: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.link:hover::before {
+  width: 100%;
+}

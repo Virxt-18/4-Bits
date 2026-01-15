@@ -1,6 +1,8 @@
 import { Shield, Mail, Phone, MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next"
 
 const Footer = () => {
+  const { t } = useTranslation();
   return (
     <footer id="contact" className="bg-gradient-card overflow-hidden border-t border-border/50">
       <div className="container mx-auto px-4 py-16">
@@ -10,25 +12,24 @@ const Footer = () => {
             <div className="flex items-center gap-3 mb-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/30 blur-lg rounded-full" />
-                <Shield className="relative h-8 w-8 text-primary" />
+                <img src="images/Logo.png" className="h-8 max-[900px]:h-6" />
               </div>
               <div>
-                <span className="font-display font-bold text-xl text-foreground">SafeTravel</span>
-                <span className="text-primary font-display font-bold">NE</span>
+                <span className="font-display font-bold text-xl text-gradient">{t("tripshield")}</span>
               </div>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Smart Tourist Safety Monitoring & Incident Response System for India's Northeast Region.
+              {t("ftext")}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Quick Links</h4>
+            <h4 className="font-display font-semibold text-foreground mb-4">{t("ql")}</h4>
             <ul className="space-y-3">
               {["Tourist Registration", "Authority Portal", "Safety Guidelines", "Emergency Contacts"].map((link, index) => (
                 <li key={index}>
-                  <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  <a href="#" className="link text-muted-foreground hover:text-primary transition-colors text-sm">
                     {link}
                   </a>
                 </li>
@@ -38,11 +39,11 @@ const Footer = () => {
 
           {/* Resources */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Resources</h4>
+            <h4 className="font-display font-semibold text-foreground mb-4">{t("res")}</h4>
             <ul className="space-y-3">
               {["Travel Advisories", "Regional Maps", "FAQ", "Privacy Policy"].map((link, index) => (
                 <li key={index}>
-                  <a href="#" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  <a href="#" className="link text-muted-foreground hover:text-primary transition-colors text-sm">
                     {link}
                   </a>
                 </li>
@@ -52,15 +53,15 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">Emergency Contact</h4>
+            <h4 className="font-display font-semibold text-foreground mb-4">{t("ql")}</h4>
             <ul className="space-y-4">
               <li className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
                   <Phone className="w-5 h-5 text-destructive" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">24/7 Helpline</p>
-                  <p className="font-semibold text-foreground">1800-XXX-XXXX</p>
+                  <p className="text-xs text-muted-foreground">{t("ec24")}</p>
+                  <p className="font-semibold text-foreground">{t("ecno")}</p>
                 </div>
               </li>
               <li className="flex items-center gap-3">
@@ -68,8 +69,8 @@ const Footer = () => {
                   <Mail className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Support Email</p>
-                  <p className="font-semibold text-foreground">support@safetravelne.gov.in</p>
+                <p className="text-xs text-muted-foreground">{t("ecse")}</p>
+                  <p className="font-semibold text-foreground">{t("ecmail")}</p>
                 </div>
               </li>
               <li className="flex items-center gap-3">
@@ -77,8 +78,8 @@ const Footer = () => {
                   <MapPin className="w-5 h-5 text-secondary" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">Headquarters</p>
-                  <p className="font-semibold text-foreground">Guwahati, Assam</p>
+                  <p className="text-xs text-muted-foreground">{t("echq")}</p>
+                  <p className="font-semibold text-foreground">{t("ecaddress")}</p>
                 </div>
               </li>
             </ul>
@@ -88,17 +89,17 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2026 SafeTravelNE. A Government of India Initiative. All rights reserved.
+            {t("cr")}
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Terms of Service
+            <a href="#" className="link text-sm text-muted-foreground hover:text-primary transition-colors">
+              {t("tos")}
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Data Protection
+            <a href="#" className="link text-sm text-muted-foreground hover:text-primary transition-colors">
+             {t("dp")}
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-              Accessibility
+            <a href="#" className="link text-sm text-muted-foreground hover:text-primary transition-colors">
+             {t("acc")}
             </a>
           </div>
         </div>

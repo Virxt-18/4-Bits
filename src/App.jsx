@@ -1,8 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import AuthorityLogin from "./pages/AuthorityLogin";
+import AuthorityDashboard from "./pages/AuthorityDashboard";
 import NotFound from "./pages/NotFound";
 import { createContext, useContext, useEffect, useState, useRef } from "react";
 import Lenis from "lenis";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute";
 
 export const LenisContext = createContext(null);
 
@@ -44,12 +51,25 @@ function App() {
       lenis.destroy();
     };
   }, []);
+
   return (
     <BrowserRouter>
+    <AuthProvider>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<PublicRoute>
+            <Home />
+          </PublicRoute>} />
+        <Route path="/register" element={<PublicRoute>
+            <Register />
+          </PublicRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>} />
+        <Route path="/authority-login" element={<AuthorityLogin />} />
+        <Route path="/authority-dashboard" element={<AuthorityDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+    </AuthProvider>
     </BrowserRouter>
   );
 

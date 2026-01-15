@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { Globe, ChevronUp } from "lucide-react"
 
 const languages = [
@@ -6,7 +6,6 @@ const languages = [
   { code: "hi", name: "Hindi", nativeName: "हिंदी" },
   { code: "as", name: "Assamese", nativeName: "অসমীয়া" },
   { code: "bn", name: "Bengali", nativeName: "বাংলা" },
-  { code: "bt", name: "Bhutia", nativeName: "Bhutia" },
   { code: "bo", name: "Bodo", nativeName: "बड़ो" },
   { code: "ks", name: "Khasi", nativeName: "Khasi" },
   { code: "ko", name: "Kokborok", nativeName: "Kokborok" },
@@ -30,9 +29,11 @@ export default function Translate({ language, changeLanguage }) {
             <button
               key={lang.code}
               onClick={() => {
-                changeLanguage(lang.code)
-                setIsOpen(false)
-              }}
+  console.log("Saving lang:", lang.code)
+  localStorage.setItem("lang", lang.code)
+  changeLanguage(lang.code)
+  setIsOpen(false)
+}}
               className={`w-full text-left px-3 py-2.5 rounded-lg transition-all mb-1 ${
                 language === lang.code
                   ? "bg-blue-500 text-white font-semibold shadow-md scale-105"

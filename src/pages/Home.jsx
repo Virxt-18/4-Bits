@@ -19,12 +19,13 @@ const Home = () => {
 
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang)   // Change react-i18next language
-    setLanguage(lang)           // Update state
+    setLanguage(lang)      
+    localStorage.setItem("lang", lang)
   };
 
   return (
     <>
-      <Loading onFinish={() => setIsLoading(false)} />
+      {isLoading && <Loading onFinish={() => setIsLoading(false)} />}
       <div className="min-h-screen min-w-screen overflow-x-hidden">
         <Header />
         <main>
