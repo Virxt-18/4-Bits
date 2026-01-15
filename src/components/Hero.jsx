@@ -7,14 +7,6 @@ import { useTranslation } from "react-i18next"
 
 gsap.registerPlugin(ScrollTrigger);
 
-const languages = [
-  "English", "हिन्दी", "অসমীয়া", "মণিপুরী", "नागामी", "मिज़ो", "Khasi", "त्रिपुरी", "Arunachali", "सिक्किमी", "বাংলা", "नेपाली"
-];
-
-const states = [
-  "Assam", "Meghalaya", "Manipur", "Nagaland", "Tripura", "Mizoram", "Arunachal Pradesh", "Sikkim"
-];
-
 const FEATURES = [
   { icon: MapPin, info: "rtt", color: "rgba(147, 238, 72,0.90)", shadow_color: "rgba(147, 238, 72,0.40)" },
   { icon: Bell, info: "isr", color: "rgba(255, 0, 50,0.90)", shadow_color: "rgba(255, 0, 50,0.40)" },
