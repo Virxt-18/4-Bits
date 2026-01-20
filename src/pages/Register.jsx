@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Shield, ArrowLeft, User, Phone, Mail, MapPin, LogIn, UserPlus, Loader } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
@@ -25,6 +25,36 @@ const Register = () => {
     destination: "",
   });
 
+  const handlePasswordReset = async () => {
+  if (!loginData.email) {
+    setError("Please enter your email to reset password.")
+    return
+  }
+
+  setLoading(true)
+  setError("")
+  setSuccess("")
+
+  try {
+    await sendPasswordResetEmail(auth, loginData.email)
+    setSuccess("Password reset link sent to your email. Check spam folder if not found.")
+  } catch (err) {
+    console.error("Reset password error:", err)
+
+    let errorMessage = "Failed to send reset email."
+    if (err.code === "auth/user-not-found") {
+      errorMessage = "No account found with this email."
+    } else if (err.code === "auth/invalid-email") {
+      errorMessage = "Invalid email address."
+    } else if (err.code === "auth/network-request-failed") {
+      errorMessage = "Network error. Please try again."
+    }
+
+    setError(errorMessage)
+  } finally {
+    setLoading(false)
+  }
+}
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -167,7 +197,7 @@ const Register = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <button
-                onClick={() => setView("login")}
+                onClick={() => {setView("login"); setError(""); setSuccess("");}}
                 className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,166,211,0.3)] hover:border-[#12c6d3] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
               >
                 <div className="flex flex-col items-center gap-4">
@@ -182,7 +212,7 @@ const Register = () => {
               </button>
 
               <button
-                onClick={() => setView("register")}
+                onClick={() => {setView("register"); setError(""); setSuccess("");}}
                 className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,198,211,0.3)] hover:border-[#12ccd3] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
               >
                 <div className="flex flex-col items-center gap-4">
@@ -208,7 +238,7 @@ const Register = () => {
       <div className="min-h-screen bg-[rgba(2,16,42,1)] flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
           <button
-            onClick={() => setView("options")}
+            onClick={() => {setView("options"); setError(""); setSuccess("");}}
             className="inline-flex items-center gap-2 text-white hover:text-[#12c0d3] transition mb-6 cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -222,11 +252,7 @@ const Register = () => {
             </div>
 
             <form onSubmit={handleLoginSubmit} className="space-y-6">
-              {error && (
-                <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
-                  {error}
-                </div>
-              )}
+              
 
               <div>
                 <label className=" text-white mb-2 text-sm font-medium flex items-center gap-2">
@@ -256,7 +282,16 @@ const Register = () => {
                   placeholder="Enter your password"
                 />
               </div>
-
+              <div className="text-right">
+  <button
+    type="button"
+    onClick={handlePasswordReset}
+    className="text-sm text-[#12c0d3] hover:underline cursor-pointer"
+    disabled={loading}
+  >
+    Forgot password?
+  </button>
+</div>
               <button
                 type="submit"
                 disabled={loading}
@@ -271,12 +306,21 @@ const Register = () => {
                   "Login"
                 )}
               </button>
-
+              {error && (
+                <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+                {success && (
+  <div className="bg-green-500/15 border border-green-500 text-green-300 px-4 py-3 rounded-lg text-sm">
+    {success}
+  </div>
+)}
               <p className="text-center text-gray-400 text-sm mt-4">
                 Don't have an account?{" "}
                 <button
                   type="button"
-                  onClick={() => setView("register")}
+                  onClick={() => {setView("register"); setError(""); setSuccess("");}}
                   className="text-[#12c0d3] hover:underline cursor-pointer"
                 >
                   Register here
@@ -294,7 +338,7 @@ const Register = () => {
     <div className="min-h-screen bg-[rgba(2,16,42,1)] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-2xl">
         <button
-          onClick={() => setView("options")}
+          onClick={() => {setView("options"); setError(""); setSuccess("");}}
           className="inline-flex items-center gap-2 text-white hover:text-[#12c0d3] transition mb-6 cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -308,18 +352,6 @@ const Register = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="bg-green-500/15 border border-green-500 text-green-300 px-4 py-3 rounded-lg text-sm">
-                {success}
-              </div>
-            )}
-
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
                 <User className="w-5 h-5 text-[#12c0d3]" />
@@ -441,12 +473,22 @@ const Register = () => {
                 "Complete Registration"
               )}
             </button>
+              {error && (
+              <div className="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
 
+            {success && (
+              <div className="bg-green-500/15 border border-green-500 text-green-300 px-4 py-3 rounded-lg text-sm">
+                {success}
+              </div>
+            )}
             <p className="text-center text-gray-400 text-sm mt-4">
               Already have an account?{" "}
               <button
                 type="button"
-                onClick={() => setView("login")}
+                onClick={() => {setView("login"); setError(""); setSuccess("");}}
                 className="text-[#12c0d3] hover:underline cursor-pointer"
               >
                 Login here
