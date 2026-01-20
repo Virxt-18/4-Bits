@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { LogOut, User, MapPin, Navigation, CreditCard, Copy, Check, AlertTriangle, Flag } from "lucide-react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import { db } from "../firebase";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection } from "firebase/firestore";
 import { sendSOSAlert } from "../api/sosAlert";
 import { submitReport } from "../api/reportAlert";
-
 // Fix for default marker icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -85,6 +83,8 @@ const Dashboard = () => {
   const [reportError, setReportError] = useState("");
   const [reportSuccess, setReportSuccess] = useState(false);
   const [reportForm, setReportForm] = useState({ title: '', description: '', category: 'general' });
+
+  const sosRef = collection(db, "location");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -193,6 +193,7 @@ const Dashboard = () => {
   };
 
   const sendSOS = async () => {
+    console.log(user)
     if (!user) {
       console.error("No user found");
       setSosError("User not authenticated");
@@ -208,8 +209,9 @@ const Dashboard = () => {
       const alertData = {
         uid: user.uid,
         email: user.email || null,
-        location: location ? { lat: location[0], lng: location[1] } : null,
-        status: "active",
+        latlon: location ? `${location[0]}:${location[1]}` : null,
+        time: serverTimestamp(),
+        status: "active"
       };
       
       console.log("Alert data:", alertData);

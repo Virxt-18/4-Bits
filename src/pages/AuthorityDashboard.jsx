@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDocs, getDoc, setDoc, collection } from "firebase/firestore";
 import { Shield, LogOut, AlertTriangle, Flag, User, Mail, Bell, MapPin, TrendingUp, Users, Clock, CheckCircle } from "lucide-react";
 import apiClient from "../utils/api";
 import { io } from "socket.io-client";
@@ -21,6 +21,8 @@ const AuthorityDashboard = () => {
   const [dataLoading, setDataLoading] = useState(false);
   const [notification, setNotification] = useState(null);
   const [socket, setSocket] = useState(null);
+
+  const sosRef = collection(db, "location");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (current) => {
@@ -66,7 +68,7 @@ const AuthorityDashboard = () => {
       const interval = setInterval(() => {
         console.log("🔄 Auto-refreshing alerts...");
         fetchData();
-      }, 2000);
+      }, 15000);
       
       let newSocket;
       
@@ -134,27 +136,30 @@ const AuthorityDashboard = () => {
     console.log("📡 Fetching alerts and reports...");
     setDataLoading(true);
     try {
-      const adminKey = import.meta.env.VITE_ADMIN_API_KEY;
-      const headers = adminKey ? { "x-admin-key": adminKey } : {};
+      const data = await getDocs(sosRef);
+      const filterdData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setAlerts(filterdData);
+      // const adminKey = import.meta.env.VITE_ADMIN_API_KEY;
+      // const headers = adminKey ? { "x-admin-key": adminKey } : {};
       
-      console.log("📡 Admin Key:", adminKey ? "✅ Set" : "❌ Missing");
+      // console.log("📡 Admin Key:", adminKey ? "✅ Set" : "❌ Missing");
       
-      const [alertsRes, reportsRes] = await Promise.all([
-        apiClient.get("/api/admin/sos-alerts", { headers }).catch(e => {
-          console.error("❌ SOS Alerts Error:", e.response?.status, e.response?.data || e.message);
-          return { data: { alerts: [] } };
-        }),
-        apiClient.get("/api/admin/reports", { headers }).catch(e => {
-          console.error("❌ Reports Error:", e.response?.status, e.response?.data || e.message);
-          return { data: { reports: [] } };
-        }),
-      ]);
+      // const [alertsRes, reportsRes] = await Promise.all([
+      //   apiClient.get("/api/admin/sos-alerts", { headers }).catch(e => {
+      //     console.error("❌ SOS Alerts Error:", e.response?.status, e.response?.data || e.message);
+      //     return { data: { alerts: [] } };
+      //   }),
+      //   apiClient.get("/api/admin/reports", { headers }).catch(e => {
+      //     console.error("❌ Reports Error:", e.response?.status, e.response?.data || e.message);
+      //     return { data: { reports: [] } };
+      //   }),
+      // ]);
       
-      console.log("✅ Alerts fetched:", alertsRes.data.alerts?.length || 0);
-      console.log("✅ Reports fetched:", reportsRes.data.reports?.length || 0);
+      // console.log("✅ Alerts fetched:", alertsRes.data.alerts?.length || 0);
+      // console.log("✅ Reports fetched:", reportsRes.data.reports?.length || 0);
       
-      setAlerts(alertsRes.data.alerts || []);
-      setReports(reportsRes.data.reports || []);
+      // setAlerts(alertsRes.data.alerts || []);
+      // setReports(reportsRes.data.reports || []);
       setError("");
     } catch (e) {
       console.error("❌ Failed to load admin data", e);
@@ -218,12 +223,12 @@ const AuthorityDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[rgba(2,16,42,1)] via-[rgba(4,25,60,1)] to-[rgba(2,16,42,1)] text-white py-8 px-4">
+    <div className="min-h-screen bg-linear-to-br from-[rgba(2,16,42,1)] via-[rgba(4,25,60,1)] to-[rgba(2,16,42,1)] text-white py-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header with Notifications */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-br from-[rgba(18,211,166,0.2)] to-[rgba(18,211,166,0.05)] p-3 rounded-xl">
+            <div className="bg-linear-to-br from-[rgba(18,211,166,0.2)] to-[rgba(18,211,166,0.05)] p-3 rounded-xl">
               <Shield className="w-8 h-8 text-[rgba(18,211,166,1)]" />
             </div>
             <div>
@@ -248,7 +253,7 @@ const AuthorityDashboard = () => {
 
         {/* Notification Toast - Enhanced */}
         {notification && (
-          <div className="fixed top-4 right-4 bg-gradient-to-r from-red-600 to-red-700 border border-red-400 rounded-lg p-6 shadow-2xl max-w-sm animate-pulse z-50">
+          <div className="fixed top-4 right-4 bg-linear-to-r from-red-600 to-red-700 border border-red-400 rounded-lg p-6 shadow-2xl max-w-sm animate-pulse z-50">
             <div className="flex items-start gap-4">
               <div className="bg-red-500/30 p-3 rounded-full">
                 <Bell className="w-6 h-6 text-red-200" />
@@ -338,7 +343,7 @@ const AuthorityDashboard = () => {
                     {alert.location?.lat && (
                       <p className="text-xs text-gray-300">📍 {alert.location.lat.toFixed(4)}, {alert.location.lng.toFixed(4)}</p>
                     )}
-                    <p className="text-xs text-gray-400 mt-1">{new Date(alert.createdAt).toLocaleTimeString()}</p>
+                    <p className="text-xs text-gray-400 mt-1">{alert.time?.toDate?.().toLocaleString() || "—"}</p>
                   </div>
                 ))
               )}
@@ -372,7 +377,7 @@ const AuthorityDashboard = () => {
 
         {/* Account Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="bg-gradient-to-br from-[rgba(18,211,166,0.1)] to-transparent border border-[rgba(18,211,166,0.3)] rounded-2xl p-6">
+          <div className="bg-linear-to-br from-[rgba(18,211,166,0.1)] to-transparent border border-[rgba(18,211,166,0.3)] rounded-2xl p-6">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
               <User className="w-6 h-6 text-[rgba(18,211,166,1)]" />
               Authority Account
@@ -395,7 +400,7 @@ const AuthorityDashboard = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-900/10 to-transparent border border-blue-500/30 rounded-2xl p-6">
+          <div className="bg-linear-to-br from-blue-900/10 to-transparent border border-blue-500/30 rounded-2xl p-6">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
               <Clock className="w-6 h-6 text-blue-400" />
               System Status

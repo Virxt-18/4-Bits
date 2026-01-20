@@ -1,21 +1,15 @@
+import { db } from "../firebase";
+import { collection, addDoc } from "firebase/firestore";
+
+
+
 export const sendSOSAlert = async (alertData) => {
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  const sosRef = collection(db, "location");
 
   try {
-    const response = await fetch(`${baseURL}/api/admin/sos-alerts`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(alertData),
-    });
+    const docRef = await addDoc(sosRef, alertData);
 
-    // Check if HTTP status is not OK
-    if (!response.ok) {
-      const errorText = await response.text(); // read response body
-      throw new Error(`HTTP ${response.status}: ${errorText}`);
-    }
-
-    const data = await response.json();
-    return { success: true, data };
+    return { success: true, docRef };
 
   } catch (error) {
     // Network errors (CORS, server down, wrong URL) show up here

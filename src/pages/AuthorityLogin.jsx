@@ -74,7 +74,7 @@ const AuthorityLogin = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
+              <label className="text-white mb-2 text-sm font-medium flex items-center gap-2">
                 <Mail className="w-4 h-4" />
                 Official Email
               </label>
@@ -89,7 +89,7 @@ const AuthorityLogin = () => {
             </div>
 
             <div>
-              <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
+              <label className="text-white mb-2 text-sm font-medium flex items-center gap-2">
                 <Lock className="w-4 h-4" />
                 Password
               </label>
