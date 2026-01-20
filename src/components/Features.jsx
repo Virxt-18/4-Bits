@@ -138,9 +138,7 @@ const Features = () => {
             >
               <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-130 transition-transform">
                 <feature.icon className="w-5 h-5 text-(--card-color)"
-                style={{
-                  '--card-color': feature.color
-                }}/>
+                />
               </div>
               <h4 className="font-medium text-sm text-foreground mb-1">{t(feature.title)}</h4>
               <p className="text-xs text-muted-foreground">{t(feature.description)}</p>
