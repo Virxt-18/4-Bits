@@ -31,7 +31,7 @@ export default function Translate({ language, changeLanguage }) {
   }, [])
 
   return (
-    <div ref={containerRef} data-lenis-prevent className="fixed bottom-6 right-6 z-9998 flex flex-col items-end gap-2">
+    <div ref={containerRef} data-lenis-prevent className="fixed bottom-6 right-6 z-9998 flex flex-col items-end gap-2 cursor-default">
       {isOpen && (
         <div className="absolute bottom-20 right-0 bg-white dark:bg-gray-900/70 backdrop-blur-lg border-2 border-blue-500 rounded-xl shadow-2xl p-3 w-56 max-h-105 overflow-y-auto z-10000">
           <div className="mb-2 pb-2 border-b border-gray-300 dark:border-gray-700">
@@ -46,7 +46,7 @@ export default function Translate({ language, changeLanguage }) {
   changeLanguage(lang.code)
   setIsOpen(false)
 }}
-              className={`w-full text-left px-3 py-2.5 rounded-lg transition-all mb-1 ${
+              className={`w-full text-left px-3 py-2.5 rounded-lg transition-all mb-1 cursor-pointer ${
                 language === lang.code
                   ? "bg-blue-500 text-white font-semibold shadow-md scale-105"
                   : "text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-900"
@@ -65,7 +65,7 @@ export default function Translate({ language, changeLanguage }) {
       )}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 shadow-xl transition-all hover:scale-110 active:scale-95"
+        className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 shadow-xl transition-all hover:scale-110 active:scale-95 cursor-pointer"
         title="Change Language"
       >
         <Globe size={20} />

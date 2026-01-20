@@ -149,15 +149,15 @@ const Register = () => {
         <div className="w-full max-w-2xl">
           <Link 
             to="/" 
-            className="inline-flex items-center gap-2 text-white hover:text-[rgba(18,211,166,1)] transition mb-6"
+            className="inline-flex items-center gap-2 text-white hover:text-[#12c0d3] transition mb-6"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Back to Home</span>
+            <span className="link hover:text-[#12c0d3]">Back to Home</span>
           </Link>
 
-          <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
+          <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,204,211,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
             <div className="flex items-center justify-center gap-3 mb-8">
-              <Shield className="w-10 h-10 text-[rgba(18,211,166,1)]" />
+              <Shield className="w-10 h-10 text-[#12c0d3]" />
               <h1 className="text-3xl font-bold text-white">Welcome</h1>
             </div>
 
@@ -168,11 +168,11 @@ const Register = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <button
                 onClick={() => setView("login")}
-                className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,211,166,0.3)] hover:border-[rgba(18,211,166,1)] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
+                className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,166,211,0.3)] hover:border-[#12c6d3] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
               >
                 <div className="flex flex-col items-center gap-4">
-                  <div className="bg-[rgba(18,211,166,0.2)] p-4 rounded-full group-hover:bg-[rgba(18,211,166,0.3)] transition">
-                    <LogIn className="w-12 h-12 text-[rgba(18,211,166,1)]" />
+                  <div className="bg-[rgba(18,211,166,0.2)] p-4 rounded-full group-hover:bg-[rgba(18,195,211,0.3)] transition">
+                    <LogIn className="w-12 h-12 text-[#12c0d3]" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">Login</h2>
                   <p className="text-gray-400 text-center">
@@ -183,11 +183,11 @@ const Register = () => {
 
               <button
                 onClick={() => setView("register")}
-                className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,211,166,0.3)] hover:border-[rgba(18,211,166,1)] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
+                className="group bg-[rgba(2,16,42,0.8)] border-2 border-[rgba(18,198,211,0.3)] hover:border-[#12ccd3] rounded-xl p-8 transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.3)] cursor-pointer"
               >
                 <div className="flex flex-col items-center gap-4">
-                  <div className="bg-[rgba(18,211,166,0.2)] p-4 rounded-full group-hover:bg-[rgba(18,211,166,0.3)] transition">
-                    <UserPlus className="w-12 h-12 text-[rgba(18,211,166,1)]" />
+                  <div className="bg-[rgba(18,211,166,0.2)] p-4 rounded-full group-hover:bg-[rgba(18,195,211,0.3)] transition">
+                    <UserPlus className="w-12 h-12 text-[#12c0d3]" />
                   </div>
                   <h2 className="text-2xl font-bold text-white">Register</h2>
                   <p className="text-gray-400 text-center">
@@ -209,15 +209,15 @@ const Register = () => {
         <div className="w-full max-w-md">
           <button
             onClick={() => setView("options")}
-            className="inline-flex items-center gap-2 text-white hover:text-[rgba(18,211,166,1)] transition mb-6"
+            className="inline-flex items-center gap-2 text-white hover:text-[#12c0d3] transition mb-6 cursor-pointer"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Back</span>
+            <span className="link">Back</span>
           </button>
 
-          <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
+          <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,176,211,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
             <div className="flex items-center justify-center gap-3 mb-8">
-              <LogIn className="w-10 h-10 text-[rgba(18,211,166,1)]" />
+              <LogIn className="w-10 h-10 text-[#12c0d3]" />
               <h1 className="text-3xl font-bold text-white">Login</h1>
             </div>
 
@@ -229,7 +229,7 @@ const Register = () => {
               )}
 
               <div>
-                <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
+                <label className=" text-white mb-2 text-sm font-medium flex items-center gap-2">
                   <Mail className="w-4 h-4" />
                   Email Address
                 </label>
@@ -239,7 +239,7 @@ const Register = () => {
                   required
                   value={loginData.email}
                   onChange={handleLoginChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,188,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Enter your email"
                 />
               </div>
@@ -252,7 +252,7 @@ const Register = () => {
                   required
                   value={loginData.password}
                   onChange={handleLoginChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,195,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Enter your password"
                 />
               </div>
@@ -260,7 +260,7 @@ const Register = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6 flex items-center justify-center gap-2"
+                className="w-full bg-[#12c0d3] hover:bg-[#12c0d3] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6 flex items-center justify-center gap-2 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -277,7 +277,7 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={() => setView("register")}
-                  className="text-[rgba(18,211,166,1)] hover:underline"
+                  className="text-[#12c0d3] hover:underline cursor-pointer"
                 >
                   Register here
                 </button>
@@ -295,15 +295,15 @@ const Register = () => {
       <div className="w-full max-w-2xl">
         <button
           onClick={() => setView("options")}
-          className="inline-flex items-center gap-2 text-white hover:text-[rgba(18,211,166,1)] transition mb-6"
+          className="inline-flex items-center gap-2 text-white hover:text-[#12c0d3] transition mb-6 cursor-pointer"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back</span>
+          <span className="link">Back</span>
         </button>
 
-        <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
+        <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,188,211,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
           <div className="flex items-center justify-center gap-3 mb-8">
-            <Shield className="w-10 h-10 text-[rgba(18,211,166,1)]" />
+            <Shield className="w-10 h-10 text-[#12c0d3]" />
             <h1 className="text-3xl font-bold text-white">Tourist Registration</h1>
           </div>
 
@@ -322,7 +322,7 @@ const Register = () => {
 
             <div className="space-y-4">
               <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
-                <User className="w-5 h-5 text-[rgba(18,211,166,1)]" />
+                <User className="w-5 h-5 text-[#12c0d3]" />
                 Personal Information
               </h2>
 
@@ -334,13 +334,13 @@ const Register = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,188,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Enter your full name"
                 />
               </div>
 
               <div>
-                <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
+                <label className="text-white mb-2 text-sm font-medium flex items-center gap-2">
                   <Mail className="w-4 h-4" />
                   Email Address *
                 </label>
@@ -350,7 +350,7 @@ const Register = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,198,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Enter your email"
                 />
               </div>
@@ -363,7 +363,7 @@ const Register = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,198,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Create a password"
                 />
               </div>
@@ -376,13 +376,13 @@ const Register = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,188,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Confirm your password"
                 />
               </div>
 
               <div>
-                <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
+                <label className="text-white mb-2 text-sm font-medium flex items-center gap-2">
                   <Phone className="w-4 h-4" />
                   Phone Number *
                 </label>
@@ -392,7 +392,7 @@ const Register = () => {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,204,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Enter your phone number"
                 />
               </div>
@@ -405,14 +405,14 @@ const Register = () => {
                   required
                   value={formData.nationality}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                  className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,204,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                   placeholder="Enter your nationality"
                 />
               </div>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-[rgba(18,211,166,0.2)]">
-              <label className="block text-white mb-2 text-sm font-medium flex items-center gap-2">
+            <div className="space-y-4 pt-4 border-t border-[rgba(18,201,211,0.2)]">
+              <label className="text-white mb-2 text-sm font-medium flex items-center gap-2">
                 <MapPin className="w-4 h-4" />
                 Destination in Northeast India *
               </label>
@@ -422,7 +422,7 @@ const Register = () => {
                 required
                 value={formData.destination}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,211,166,0.3)] rounded-lg text-white focus:outline-none focus:border-[rgba(18,211,166,1)] transition"
+                className="w-full px-4 py-3 bg-[rgba(2,16,42,0.8)] border border-[rgba(18,208,211,0.3)] rounded-lg text-white focus:outline-none focus:border-[#12c0d3] transition"
                 placeholder="e.g., Gangtok, Shillong, Guwahati"
               />
             </div>
@@ -430,7 +430,7 @@ const Register = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6 flex items-center justify-center gap-2"
+              className="w-full bg-[#12c0d3] hover:bg-[#12c0d3] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-6 flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -447,7 +447,7 @@ const Register = () => {
               <button
                 type="button"
                 onClick={() => setView("login")}
-                className="text-[rgba(18,211,166,1)] hover:underline"
+                className="text-[#12c0d3] hover:underline cursor-pointer"
               >
                 Login here
               </button>
