@@ -82,7 +82,7 @@ export default function Hero() {
               overflow-hidden flex items-center justify-center
               bg-[rgba(2,16,42,1)]">
         
-        <div class="absolute w-[clamp(200px,40vw,1600px)] h-[clamp(200px,40vw,1600px)] rounded-full pulse-glow
+        <div className="absolute w-[clamp(200px,40vw,1600px)] h-[clamp(200px,40vw,1600px)] rounded-full pulse-glow
     bg-[radial-gradient(circle,rgba(0,200,255,0.2)_0%,rgba(0,200,255,0.1)_30%,transparent_70%)] opacity-30">
         </div>
         <div ref={desktopContentRef} className="hero-content relative max-md:hidden perspective w-full h-full flex items-center justify-center">

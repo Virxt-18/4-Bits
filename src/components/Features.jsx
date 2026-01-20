@@ -131,9 +131,12 @@ const Features = () => {
           {additionalFeatures.map((feature, index) => (
             <div
               key={index}
-              className="group glass rounded-xl p-4 text-center hover:bg-primary/5 transition-all duration-300 cursor-default"
+              className="group glass rounded-xl p-4 text-center transition-all duration-300 cursor-default border border-transparent hover:border-(--card-color)"
+              style={{
+                  '--card-color': feature.color
+                }}
             >
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:scale-130 transition-transform">
                 <feature.icon className="w-5 h-5 text-(--card-color)"
                 style={{
                   '--card-color': feature.color

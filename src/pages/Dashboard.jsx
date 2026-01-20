@@ -45,7 +45,7 @@ function FieldRow({ label, value, loading, copyable }) {
 
   return (
     <div className="flex items-center gap-3 bg-[rgba(2,16,42,0.8)] rounded p-3">
-      <span className="text-gray-400 shrink-0 min-w-[110px]">{label}</span>
+      <span className="text-gray-400 shrink-0 min-w-27.5">{label}</span>
       <span
         className="text-white/90 break-all grow"
         title={loading ? "" : String(value ?? "")}

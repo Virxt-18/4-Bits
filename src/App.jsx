@@ -10,6 +10,10 @@ import Lenis from "lenis";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
+import { useTranslation } from "react-i18next";
+import Translate from "./components/Translate";
+import Loading from "./pages/Loading";
+import "./i18n.js";
 
 export const LenisContext = createContext(null);
 
@@ -18,7 +22,17 @@ export function useLenis() {
 }
 
 function App() {
+
+  const { i18n } = useTranslation();
   const lenisRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [language, setLanguage] = useState(i18n.language);
+
+  const changeLanguage = (lang) => {
+    i18n.changeLanguage(lang)   // Change react-i18next language
+    setLanguage(lang)      
+    localStorage.setItem("lang", lang)
+  };
 
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
@@ -51,9 +65,10 @@ function App() {
       lenis.destroy();
     };
   }, []);
-
+  console.log(isLoading);
   return (
     <BrowserRouter>
+    {isLoading && <Loading onFinish={() => setIsLoading(false)} />}
     <AuthProvider>
       <Routes>
         <Route path="/" element={<PublicRoute>
@@ -70,6 +85,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
+    <Translate language={language} changeLanguage={changeLanguage} />
     </BrowserRouter>
   );
 

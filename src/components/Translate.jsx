@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Globe, ChevronUp } from "lucide-react"
 
 const languages = [
@@ -17,11 +17,23 @@ const languages = [
 export default function Translate({ language, changeLanguage }) {
   const [isOpen, setIsOpen] = useState(false)
   const currentLang = languages.find(lang => lang.code === language)
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   return (
-    <div className="fixed bottom-6 right-6 z-9999 flex flex-col items-end gap-2">
+    <div ref={containerRef} data-lenis-prevent className="fixed bottom-6 right-6 z-9998 flex flex-col items-end gap-2">
       {isOpen && (
-        <div className="absolute bottom-20 right-0 bg-white dark:bg-gray-900 border-2 border-blue-500 rounded-xl shadow-2xl p-3 w-56 max-h-105 overflow-y-auto z-10000">
+        <div className="absolute bottom-20 right-0 bg-white dark:bg-gray-900/70 backdrop-blur-lg border-2 border-blue-500 rounded-xl shadow-2xl p-3 w-56 max-h-105 overflow-y-auto z-10000">
           <div className="mb-2 pb-2 border-b border-gray-300 dark:border-gray-700">
             <p className="text-sm font-bold text-gray-700 dark:text-gray-200 px-2">Select Language</p>
           </div>
