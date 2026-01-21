@@ -1,7 +1,7 @@
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 
-
+// DO NOT CHANGE
 
 export const sendSOSAlert = async (alertData) => {
   const sosRef = collection(db, "location");
@@ -12,10 +12,8 @@ export const sendSOSAlert = async (alertData) => {
     return { success: true, docRef };
 
   } catch (error) {
-    // Network errors (CORS, server down, wrong URL) show up here
     console.error('Error sending SOS alert:', error);
 
-    // Optional: distinguish network vs HTTP errors
     if (error instanceof TypeError) {
       console.error('Network or CORS error:', error.message);
     } else {
