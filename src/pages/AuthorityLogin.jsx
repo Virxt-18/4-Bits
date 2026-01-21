@@ -57,7 +57,7 @@ const AuthorityLogin = () => {
           className="inline-flex items-center gap-2 text-white hover:text-[rgba(18,211,166,1)] transition mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Back to Home</span>
+          <span className="link">Back to Home</span>
         </Link>
 
         <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-8 shadow-[0_0_30px_rgba(18,211,166,0.2)]">
@@ -106,7 +106,7 @@ const AuthorityLogin = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-2 flex items-center justify-center gap-2"
+              className="w-full bg-[rgba(18,211,166,1)] hover:bg-[rgba(18,211,166,0.8)] disabled:bg-gray-500 text-[rgba(2,16,42,1)] font-bold py-4 rounded-lg transition duration-200 hover:shadow-[0_0_20px_rgba(18,211,166,0.5)] active:scale-98 mt-2 flex items-center justify-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <>
