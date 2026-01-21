@@ -166,5 +166,32 @@
   "haras": "Harassment",
   "sf": "Scam/Fraud",
   "other": "Other",
-  "desc": "Description"
+  "desc": "Description",
+
+
+
+
+  "oe": "Official Email",
+  "ep": "Enter password",
+  "laa": "Login as Authority",
+  "laatext": "Access restricted to verified authority accounts (Role = 'Authority' in Firestore users collection).",
+  "rtems": "Real-time Emergency Management System",
+  "aa": "Active Alerts",
+  "rep": "Reports",
+  "reso": "Resolved",
+  "uu": "Unique Users",
+  "szm": "Safety Zone Map - Real-time Visualization",
+  "leg": "Legend",
+  "lr": "Landslide Report",
+  "or": "Other Report",
+  "asosa": "Active SOS Alerts",
+  "active": "Active",
+  "rr": "Recent Reports",
+  "nry": "No reports yet",
+  "authacc": "Authority Account",
+  "role": "Role",
+  "sys": "System Status",
+  "sc": "Safety Connection",
+  "db": "Database",
+  "lastu": "Last Update"
 }
