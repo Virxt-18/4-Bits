@@ -5,7 +5,6 @@ import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { doc, getDocs, getDoc, setDoc, collection } from "firebase/firestore";
 import { Shield, LogOut, AlertTriangle, Flag, User, Mail, Bell, MapPin, TrendingUp, Users, Clock, CheckCircle } from "lucide-react";
-import apiClient from "../utils/api";
 import { io } from "socket.io-client";
 import SafetyMap from "../components/SafetyMap";
 
@@ -330,7 +329,7 @@ const AuthorityDashboard = () => {
               <AlertTriangle className="w-6 h-6 text-red-500" />
               Active SOS Alerts ({alerts?.filter(a => a?.status === 'active')?.length || 0})
             </h3>
-            <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+            <div data-lenis-prevent className="space-y-2 max-h-96 overflow-y-auto pr-2">
               {!alerts || alerts.filter(a => a?.status === 'active').length === 0 ? (
                 <p className="text-gray-400 text-sm text-center py-8">✓ No active alerts</p>
               ) : (
@@ -356,7 +355,7 @@ const AuthorityDashboard = () => {
               <Flag className="w-6 h-6 text-orange-500" />
               Recent Reports ({reports?.length || 0})
             </h3>
-            <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+            <div data-lenis-prevent className="space-y-2 max-h-96 overflow-y-auto pr-2">
               {!reports || reports.length === 0 ? (
                 <p className="text-gray-400 text-sm text-center py-8">No reports yet</p>
               ) : (
