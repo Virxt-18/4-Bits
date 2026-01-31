@@ -4,11 +4,27 @@ import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { signOut } from "firebase/auth";
 import { doc, getDocs, getDoc, setDoc, collection } from "firebase/firestore";
-import { Shield, LogOut, AlertTriangle, Flag, User, Mail, Bell, MapPin, TrendingUp, Users, Clock, CheckCircle } from "lucide-react";
+import {
+  Shield,
+  LogOut,
+  AlertTriangle,
+  Flag,
+  User,
+  Mail,
+  Bell,
+  MapPin,
+  TrendingUp,
+  Users,
+  Clock,
+  CheckCircle,
+} from "lucide-react";
 import { io } from "socket.io-client";
 import SafetyMap from "../components/SafetyMap";
+import { useTranslation } from "react-i18next";
 
 const AuthorityDashboard = () => {
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [role, setRole] = useState(null);
@@ -68,14 +84,15 @@ const AuthorityDashboard = () => {
         console.log("🔄 Auto-refreshing alerts...");
         fetchData();
       }, 15000);
-      
+
       let newSocket;
-      
+
       try {
-        const socketUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+        const socketUrl =
+          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
         console.log("Connecting to Socket.io at:", socketUrl);
         console.log("🔌 Initializing Socket.io connection...");
-        
+
         newSocket = io(socketUrl, {
           reconnection: true,
           reconnectionDelay: 1000,
@@ -136,13 +153,16 @@ const AuthorityDashboard = () => {
     setDataLoading(true);
     try {
       const data = await getDocs(sosRef);
-      const filterdData = data.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const filterdData = data.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
       setAlerts(filterdData);
       // const adminKey = import.meta.env.VITE_ADMIN_API_KEY;
       // const headers = adminKey ? { "x-admin-key": adminKey } : {};
-      
+
       // console.log("📡 Admin Key:", adminKey ? "✅ Set" : "❌ Missing");
-      
+
       // const [alertsRes, reportsRes] = await Promise.all([
       //   apiClient.get("/api/admin/sos-alerts", { headers }).catch(e => {
       //     console.error("❌ SOS Alerts Error:", e.response?.status, e.response?.data || e.message);
@@ -153,10 +173,10 @@ const AuthorityDashboard = () => {
       //     return { data: { reports: [] } };
       //   }),
       // ]);
-      
+
       // console.log("✅ Alerts fetched:", alertsRes.data.alerts?.length || 0);
       // console.log("✅ Reports fetched:", reportsRes.data.reports?.length || 0);
-      
+
       // setAlerts(alertsRes.data.alerts || []);
       // setReports(reportsRes.data.reports || []);
       setError("");
@@ -170,7 +190,11 @@ const AuthorityDashboard = () => {
 
   const makeAuthority = async () => {
     try {
-      await setDoc(doc(db, "users", user.uid), { Role: "Authority" }, { merge: true });
+      await setDoc(
+        doc(db, "users", user.uid),
+        { Role: "Authority" },
+        { merge: true },
+      );
       setRole("Authority");
       alert("Authority role set successfully!");
       window.location.reload();
@@ -202,7 +226,9 @@ const AuthorityDashboard = () => {
     return (
       <div className="min-h-screen bg-[rgba(2,16,42,1)] flex items-center justify-center px-4">
         <div className="bg-[rgba(8,12,22,0.95)] border border-red-500/40 rounded-2xl p-8 max-w-lg w-full text-center shadow-[0_0_30px_rgba(239,68,68,0.25)]">
-          <p className="text-red-400 font-semibold mb-4">Authority access required.</p>
+          <p className="text-red-400 font-semibold mb-4">
+            Authority access required.
+          </p>
           {error && <p className="text-gray-300 text-sm mb-4">{error}</p>}
           <button
             onClick={makeAuthority}
@@ -232,7 +258,9 @@ const AuthorityDashboard = () => {
             </div>
             <div>
               <h1 className="text-4xl font-bold">Authority Dashboard</h1>
-              <p className="text-gray-400">Real-time Emergency Management System</p>
+              <p className="text-gray-400">
+                Real-time Emergency Management System
+              </p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -259,11 +287,18 @@ const AuthorityDashboard = () => {
               </div>
               <div className="flex-1">
                 <p className="font-bold text-lg">{notification.message}</p>
-                <p className="text-red-100 text-sm mt-1">📧 {notification.email}</p>
+                <p className="text-red-100 text-sm mt-1">
+                  📧 {notification.email}
+                </p>
                 {notification.location.lat !== 0 && (
-                  <p className="text-red-100 text-xs mt-1">📍 {notification.location.lat.toFixed(4)}, {notification.location.lng.toFixed(4)}</p>
+                  <p className="text-red-100 text-xs mt-1">
+                    📍 {notification.location.lat.toFixed(4)},{" "}
+                    {notification.location.lng.toFixed(4)}
+                  </p>
                 )}
-                <p className="text-red-200 text-xs mt-2">{new Date().toLocaleTimeString()}</p>
+                <p className="text-red-200 text-xs mt-2">
+                  {new Date().toLocaleTimeString()}
+                </p>
               </div>
             </div>
           </div>
@@ -275,7 +310,9 @@ const AuthorityDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Active Alerts</p>
-                <p className="text-3xl font-bold text-red-400">{alerts?.filter(a => a?.status === 'active')?.length || 0}</p>
+                <p className="text-3xl font-bold text-red-400">
+                  {alerts?.filter((a) => a?.status === "active")?.length || 0}
+                </p>
               </div>
               <AlertTriangle className="w-10 h-10 text-red-500/50" />
             </div>
@@ -285,7 +322,9 @@ const AuthorityDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Reports</p>
-                <p className="text-3xl font-bold text-orange-400">{reports?.length || 0}</p>
+                <p className="text-3xl font-bold text-orange-400">
+                  {reports?.length || 0}
+                </p>
               </div>
               <Flag className="w-10 h-10 text-orange-500/50" />
             </div>
@@ -295,7 +334,9 @@ const AuthorityDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Resolved</p>
-                <p className="text-3xl font-bold text-green-400">{alerts?.filter(a => a?.status === 'resolved')?.length || 0}</p>
+                <p className="text-3xl font-bold text-green-400">
+                  {alerts?.filter((a) => a?.status === "resolved")?.length || 0}
+                </p>
               </div>
               <CheckCircle className="w-10 h-10 text-green-500/50" />
             </div>
@@ -305,7 +346,9 @@ const AuthorityDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Unique Users</p>
-                <p className="text-3xl font-bold text-blue-400">{new Set(alerts?.map(a => a?.uid) || []).size}</p>
+                <p className="text-3xl font-bold text-blue-400">
+                  {new Set(alerts?.map((a) => a?.uid) || []).size}
+                </p>
               </div>
               <Users className="w-10 h-10 text-blue-500/50" />
             </div>
@@ -327,24 +370,45 @@ const AuthorityDashboard = () => {
           <div className="bg-[rgba(8,12,22,0.95)] border border-[rgba(18,211,166,0.3)] rounded-2xl p-6">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
               <AlertTriangle className="w-6 h-6 text-red-500" />
-              Active SOS Alerts ({alerts?.filter(a => a?.status === 'active')?.length || 0})
+              Active SOS Alerts (
+              {alerts?.filter((a) => a?.status === "active")?.length || 0})
             </h3>
-            <div data-lenis-prevent className="space-y-2 max-h-96 overflow-y-auto pr-2">
-              {!alerts || alerts.filter(a => a?.status === 'active').length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-8">✓ No active alerts</p>
+            <div
+              data-lenis-prevent
+              className="space-y-2 max-h-96 overflow-y-auto pr-2"
+            >
+              {!alerts ||
+              alerts.filter((a) => a?.status === "active").length === 0 ? (
+                <p className="text-gray-400 text-sm text-center py-8">
+                  ✓ No active alerts
+                </p>
               ) : (
-                alerts.filter(a => a?.status === 'active').map((alert) => (
-                  <div key={alert._id} className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 hover:bg-red-900/30 transition">
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="font-semibold text-red-300">{alert.email || 'Unknown'}</span>
-                      <span className="text-xs bg-red-600/50 px-2 py-1 rounded">ACTIVE</span>
+                alerts
+                  .filter((a) => a?.status === "active")
+                  .map((alert) => (
+                    <div
+                      key={alert._id}
+                      className="bg-red-900/20 border border-red-500/30 rounded-lg p-3 hover:bg-red-900/30 transition"
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="font-semibold text-red-300">
+                          {alert.email || "Unknown"}
+                        </span>
+                        <span className="text-xs bg-red-600/50 px-2 py-1 rounded">
+                          ACTIVE
+                        </span>
+                      </div>
+                      {alert.location?.lat && (
+                        <p className="text-xs text-gray-300">
+                          📍 {alert.location.lat.toFixed(4)},{" "}
+                          {alert.location.lng.toFixed(4)}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-400 mt-1">
+                        {alert.time?.toDate?.().toLocaleString() || "—"}
+                      </p>
                     </div>
-                    {alert.location?.lat && (
-                      <p className="text-xs text-gray-300">📍 {alert.location.lat.toFixed(4)}, {alert.location.lng.toFixed(4)}</p>
-                    )}
-                    <p className="text-xs text-gray-400 mt-1">{alert.time?.toDate?.().toLocaleString() || "—"}</p>
-                  </div>
-                ))
+                  ))
               )}
             </div>
           </div>
@@ -355,18 +419,34 @@ const AuthorityDashboard = () => {
               <Flag className="w-6 h-6 text-orange-500" />
               Recent Reports ({reports?.length || 0})
             </h3>
-            <div data-lenis-prevent className="space-y-2 max-h-96 overflow-y-auto pr-2">
+            <div
+              data-lenis-prevent
+              className="space-y-2 max-h-96 overflow-y-auto pr-2"
+            >
               {!reports || reports.length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-8">No reports yet</p>
+                <p className="text-gray-400 text-sm text-center py-8">
+                  No reports yet
+                </p>
               ) : (
                 reports.map((report) => (
-                  <div key={report._id} className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-3 hover:bg-orange-900/30 transition">
+                  <div
+                    key={report._id}
+                    className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-3 hover:bg-orange-900/30 transition"
+                  >
                     <div className="flex items-start justify-between mb-2">
-                      <span className="font-semibold text-orange-300">{report.title || 'Untitled'}</span>
-                      <span className="text-xs bg-orange-600/50 px-2 py-1 rounded">{report.category || 'general'}</span>
+                      <span className="font-semibold text-orange-300">
+                        {report.title || "Untitled"}
+                      </span>
+                      <span className="text-xs bg-orange-600/50 px-2 py-1 rounded">
+                        {report.category || "general"}
+                      </span>
                     </div>
-                    <p className="text-xs text-gray-300">{report.description || 'No description'}</p>
-                    <p className="text-xs text-gray-400 mt-1">{new Date(report.createdAt).toLocaleTimeString()}</p>
+                    <p className="text-xs text-gray-300">
+                      {report.description || "No description"}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {new Date(report.createdAt).toLocaleTimeString()}
+                    </p>
                   </div>
                 ))
               )}
@@ -388,7 +468,9 @@ const AuthorityDashboard = () => {
               </div>
               <div>
                 <p className="text-gray-400 text-sm">Role</p>
-                <p className="text-[rgba(18,211,166,1)] font-semibold">🛡️ {role}</p>
+                <p className="text-[rgba(18,211,166,1)] font-semibold">
+                  🛡️ {role}
+                </p>
               </div>
               {authorityEmail && (
                 <div>
@@ -407,15 +489,21 @@ const AuthorityDashboard = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-gray-400">Socket Connection</p>
-                <span className="text-xs bg-green-600/50 px-3 py-1 rounded-full text-green-200">🟢 Connected</span>
+                <span className="text-xs bg-green-600/50 px-3 py-1 rounded-full text-green-200">
+                  🟢 Connected
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-gray-400">Database</p>
-                <span className="text-xs bg-green-600/50 px-3 py-1 rounded-full text-green-200">🟢 Connected</span>
+                <span className="text-xs bg-green-600/50 px-3 py-1 rounded-full text-green-200">
+                  🟢 Connected
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <p className="text-gray-400">Last Update</p>
-                <span className="text-xs text-gray-300">{new Date().toLocaleTimeString()}</span>
+                <span className="text-xs text-gray-300">
+                  {new Date().toLocaleTimeString()}
+                </span>
               </div>
             </div>
           </div>
